@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -14,5 +13,8 @@ export default defineConfig({
       },
       protocolImports: true,
     }),
-  ],
+  ],  
+  css: {
+    postcss: './postcss.config.js',
+  },
 });
