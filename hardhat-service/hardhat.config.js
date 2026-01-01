@@ -4,7 +4,7 @@ require("dotenv").config(); // Ensure dotenv is loaded if using process.env
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.28",
-  networks: { // Note: this should be "networks" (plural)
+  networks: { 
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL || "", 
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
