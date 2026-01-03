@@ -4,7 +4,8 @@ import { ConnectKitProvider } from "connectkit";
 import { queryClient, wagmiConfiguration } from "./config/wagmiConfig";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/layout/Header";
-import WalletConnectButton from "./components/WalletConnectButton";
+import { Dashboard } from "./components/DashBoard";
+import { CreateOrder } from "./components/CreateOrder";
 
 function App() {
   return (
@@ -14,7 +15,8 @@ function App() {
           <BrowserRouter>
             <Header />
             <Routes>
-              <Route path="/wallet" element = {<WalletConnectButton/>}/>
+              <Route path="/wallet" element = {<Dashboard/>}/>
+              <Route path="/pasteOrder" element = {<CreateOrder/>}/>
             </Routes>
           </BrowserRouter>
         </ConnectKitProvider>

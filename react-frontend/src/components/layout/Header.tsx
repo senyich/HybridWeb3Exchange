@@ -9,8 +9,6 @@ const Header = () => {
 
   const navigation = [
     { name: 'Торговля', href: '/trade', current: location.pathname === '/trade' },
-    { name: 'Рынки', href: '/markets', current: location.pathname === '/markets' },
-    { name: 'Кошелек', href: '/wallet', current: location.pathname === '/wallet' },
   ];
 
   return (
@@ -51,7 +49,7 @@ const Header = () => {
             
             <div className="hidden md:flex items-center space-x-3">
               <Link
-                to="/profile"
+                to="/wallet"
                 className="flex items-center space-x-2 bg-gradient-to-r from-purple-900 to-crimson-dark px-4 py-2 rounded-lg hover:shadow-neon-purple transition-all duration-300"
               >
                 <User className="w-5 h-5" />

@@ -6,7 +6,7 @@ import {
   BadRequestException,
   InternalServerErrorException
 } from '@nestjs/common';
-import { BlockchainService } from './blockchain.service';
+import { BlockchainService } from '../../service/blockchain/blockchain.service';
 import { ethers } from 'ethers';
 
 @Controller('blockchain')
