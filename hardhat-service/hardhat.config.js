@@ -3,7 +3,14 @@ require("dotenv").config(); // Ensure dotenv is loaded if using process.env
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.28",
+  solidity: "0.8.20",
+  settings: {
+    evmVersion: "paris", 
+    optimizer: {
+      enabled: true,
+      runs: 200,
+    },
+  },
   networks: { 
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL || "", 

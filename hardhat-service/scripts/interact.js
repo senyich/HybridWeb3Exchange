@@ -1,7 +1,7 @@
 const hre = require("hardhat");
 
 async function main() {
-  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const contractAddress = "0xC09931BC44bd206550423fCD77B5B9b403021cf0";
   
   const [signer] = await hre.ethers.getSigners();
   
@@ -9,8 +9,15 @@ async function main() {
   const contract = await MyContract.attach(contractAddress);
 
   console.log("--- Отчет по контракту ---");
-  const rawBalance = await contract.balances(signer.address);
-  console.log("Баланс (через mapping напрямую):", hre.ethers.formatEther(rawBalance));
+
+  console.log("Попытка депозита 0.01 ETH...");
+  const tx = await contract.deposit({ value: hre.ethers.parseEther("0.01") });
+  
+  console.log("Транзакция отправлена:", tx.hash);
+  await tx.wait(); 
+  
+  const newBalance = await contract.balances(signer.address);
+  console.log("Новый баланс:", hre.ethers.formatEther(newBalance));
 }
 
 main().catch((error) => {

@@ -4,7 +4,7 @@ import { ConnectKitProvider } from "connectkit";
 import { queryClient, wagmiConfiguration } from "./config/wagmiConfig";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/layout/Header";
-import { Dashboard } from "./components/DashBoard";
+import { Dashboard } from "./pages/DashBoard";
 import { CreateOrder } from "./components/CreateOrder";
 
 function App() {
