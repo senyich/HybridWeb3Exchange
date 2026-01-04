@@ -16,14 +16,6 @@ export const Dashboard = () => {
     address: address,
   });
 
-  const { data: contractUserBalance } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: ExchangeBaseABI,
-    functionName: "getBalance",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address },
-  });
-
   const { data: totalLiquidity } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: ExchangeBaseABI,
@@ -32,10 +24,6 @@ export const Dashboard = () => {
 
   const displayWalletBalance = walletBalance?.value 
     ? parseFloat(formatEther(walletBalance.value)).toFixed(4) 
-    : "0.0000";
-
-  const displayUserContractBalance = contractUserBalance !== undefined 
-    ? parseFloat(formatEther(contractUserBalance)).toFixed(4) 
     : "0.0000";
 
   const displayTotalLiquidity = totalLiquidity !== undefined 
@@ -61,7 +49,7 @@ export const Dashboard = () => {
       <nav className="max-w-7xl mx-auto flex justify-between items-center mb-16">
         <div className="relative group">
           <h1 className="text-4xl font-black tracking-tighter italic text-transparent bg-clip-text bg-neon-glow animate-pulse-glow">
-            DIPLOMA.EX
+            Ru.HEX
           </h1>
           <div className="absolute -bottom-2 left-0 w-0 h-1 bg-purple-neon transition-all duration-500 group-hover:w-full shadow-neon-purple"></div>
         </div>
@@ -84,13 +72,6 @@ export const Dashboard = () => {
             value={displayWalletBalance} 
             unit="ETH"
             glowColor="purple"
-          />
-          
-          <StatCard 
-            title="Internal Exchange Balance" 
-            value={displayUserContractBalance} 
-            unit="ETH"
-            glowColor="red"
           />
 
           <StatCard 
@@ -137,11 +118,6 @@ export const Dashboard = () => {
           </div>
         </section>
       </main>
-
-      <footer className="max-w-7xl mx-auto mt-20 pt-8 border-t border-purple-dark/30 flex justify-between text-[10px] uppercase tracking-[0.3em] text-purple-light/40">
-        <span>Hybrid Exchange Protocol v1.0</span>
-        <span>Secured by Sepolia Testnet</span>
-      </footer>
     </div>
   );
 };

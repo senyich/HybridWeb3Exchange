@@ -1,0 +1,56 @@
+﻿using asp.net_service.Dtos;
+using asp.net_service.Services.Abstraction;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Nethereum.Signer;
+
+namespace asp.net_service;
+
+[Route("api/[controller]")]
+[ApiController]
+public class OrdersController : ControllerBase
+{
+    private readonly EthereumMessageSigner _signer = new EthereumMessageSigner();
+    private readonly IOrderService _orderService;
+
+    public OrdersController(IOrderService orderService)
+    {
+        _orderService = orderService;
+    }
+
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateOrder([FromBody] OrderDto order)
+    {
+        if (order == null)
+            return BadRequest("Order is required");
+
+        if (string.IsNullOrWhiteSpace(order.MakerAddress) || string.IsNullOrWhiteSpace(order.Signature))
+            return BadRequest("MakerAddress and Signature are required");
+
+        // normalize side to expected values
+        if (string.Equals(order.Side, "buy", StringComparison.OrdinalIgnoreCase)) order.Side = "Buy";
+        else if (string.Equals(order.Side, "sell", StringComparison.OrdinalIgnoreCase)) order.Side = "Sell";
+
+        if (order.Side != "Buy" && order.Side != "Sell")
+            return BadRequest("Side must be 'Buy' or 'Sell'");
+
+        var messageToSign = $"I want to {order.Side} {order.Amount} ETH at price {order.Price}. Nonce: {order.Nonce}";
+        try
+        {
+            var recoveredAddress = _signer.EncodeUTF8AndEcRecover(messageToSign, order.Signature);
+            if (!string.Equals(recoveredAddress, order.MakerAddress, StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest("Invalid signature! You are not the owner of this wallet.");
+            }
+
+            var (success, message) = await _orderService.PlaceOrderAsync(order);
+            if (!success) return BadRequest(message);
+
+            return Ok(new { status = "Order placed", message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Verification failed: {ex.Message}");
+        }
+    }
+}

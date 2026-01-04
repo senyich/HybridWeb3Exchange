@@ -1,0 +1,17 @@
+﻿using asp.net_service.Entities;
+using asp.net_service.Persistance.IRepositories;
+
+namespace asp.net_service.Persistance.Repositories;
+
+public class OrderRepository : IOrderRepository
+{
+    public Task AddAsync(Order order)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<Order>> GetActiveOrdersAsync()
+    {
+        throw new NotImplementedException();
+    }
+}

@@ -1,0 +1,40 @@
+﻿using asp.net_service.Dtos;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Nethereum.Signer;
+using Org.BouncyCastle.Asn1.X509;
+
+namespace asp.net_service;
+
+[Route("api/[controller]")]
+[ApiController]
+public class OrdersController : ControllerBase
+{
+    private readonly EthereumMessageSigner _signer = new EthereumMessageSigner();
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateOrder([FromBody] OrderDto order)
+    {
+        var messageToSign = $"I want to {order.Side} {order.Amount} ETH at price {order.Price}. Nonce: {order.Nonce}";
+        try
+        {
+            var recoveredAddress = _signer.EncodeUTF8AndEcRecover(messageToSign, order.Signature);
+            if (!recoveredAddress.Equals(order.MakerAddress, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return BadRequest("Invalid signature! You are not the owner of this wallet.");
+            }
+
+            // 4. Проверяем баланс в БАЗЕ ДАННЫХ (не в блокчейне, это медленно)
+            // var userBalance = _db.Balances.First(u => u.Address == order.MakerAddress);
+            // if (userBalance.Free < order.Amount) return BadRequest("Not enough funds");
+
+            // 5. Если все ок — сохраняем ордер в Orderbook
+            // _orderBook.Add(order);
+
+            return Ok(new { status = "Order placed", orderId = Guid.NewGuid() });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Verification failed: {ex.Message}");
+        }
+    }
+}

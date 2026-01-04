@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "bSN98q0pflCbEeVEgO4+Q8JrGZJHLm8DNllD1s+hDDM=",
+  "Source": "asp.net-service",
+  "BasePath": "_content/asp.net-service",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
