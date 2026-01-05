@@ -1,28 +1,34 @@
-﻿namespace asp.net_service.Services.Implementation;
-
-using asp.net_service.Persistance.IRepositories;
+﻿using asp.net_service.Persistance.IRepositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
+using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
+using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
+namespace asp.net_service.Services.Implementation;
+
+#region Event DTO
 
 [Event("Deposit")]
 public class DepositEthEventDTO : IEventDTO
 {
     [Parameter("address", "user", 1, true)]
-    public string User { get; set; }
+    public string User { get; set; } = default!;
 
     [Parameter("uint256", "amount", 2, false)]
     public BigInteger Amount { get; set; }
 }
+
+#endregion
 
 public class BlockchainWorker : BackgroundService
 {
@@ -30,9 +36,14 @@ public class BlockchainWorker : BackgroundService
     private readonly ILogger<BlockchainWorker> _logger;
     private readonly string _rpcUrl;
     private readonly string _contractAddress;
-    private BigInteger _lastProcessedBlock = 0;
 
-    public BlockchainWorker(IServiceScopeFactory scopeFactory, IConfiguration configuration, ILogger<BlockchainWorker> logger)
+    private const int MaxBlockRange = 100;
+    private BigInteger _lastProcessedBlock;
+
+    public BlockchainWorker(
+        IServiceScopeFactory scopeFactory,
+        IConfiguration configuration,
+        ILogger<BlockchainWorker> logger)
     {
         _scopeFactory = scopeFactory;
         _logger = logger;
@@ -44,70 +55,112 @@ public class BlockchainWorker : BackgroundService
     {
         var web3 = new Web3(_rpcUrl);
 
-        var currentBlock = await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
-        _lastProcessedBlock = currentBlock.Value > 100 ? currentBlock.Value - 100 : 0;
+        var depositEvent = web3.Eth.GetEvent<DepositEthEventDTO>(_contractAddress);
+
+        try
+        {
+            var currentBlock = await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
+
+            _lastProcessedBlock = 0;
+
+            _logger.LogInformation(
+                "BlockchainWorker started. Contract={Contract}, StartBlock={Block}",
+                _contractAddress,
+                _lastProcessedBlock);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("RPC connection failed: {Error}", ex.Message);
+            return;
+        }
 
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                var latestBlock = await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
+                var latestBlock = (await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync()).Value;
 
-                if (latestBlock.Value > _lastProcessedBlock)
+                if (_lastProcessedBlock >= latestBlock)
                 {
-                    var filterInput = new NewFilterInput
-                    {
-                        FromBlock = new BlockParameter(new Nethereum.Hex.HexTypes.HexBigInteger(_lastProcessedBlock + 1)),
-                        ToBlock = new BlockParameter(latestBlock),
-                        Address = new[] { _contractAddress }
-                    };
-
-                    var logs = await web3.Eth.Filters.GetLogs.SendRequestAsync(filterInput);
-
-                    var eventHandler = web3.Eth.GetEvent<DepositEthEventDTO>(_contractAddress);
-
-                    foreach (var log in logs)
-                    {
-                        try
-                        {
-                            EventLog<DepositEthEventDTO> decoded = Event<DepositEthEventDTO>.DecodeEvent(log);
-                            if (decoded?.Event != null)
-                            {
-                                await ProcessDepositAsync(decoded.Event.User, decoded.Event.Amount);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error decoding log or processing deposit");
-                        }
-                    }
-
-                    _lastProcessedBlock = latestBlock.Value;
+                    await Task.Delay(5000, stoppingToken);
+                    continue;
                 }
+
+                var fromBlock = _lastProcessedBlock + 1;
+                var toBlock = BigInteger.Min(
+                    _lastProcessedBlock + MaxBlockRange,
+                    latestBlock);
+
+                var filter = depositEvent.CreateFilterInput(
+                    new BlockParameter(new HexBigInteger(fromBlock)),
+                    new BlockParameter(new HexBigInteger(toBlock))
+                );
+
+                var logs = await web3.Eth.Filters.GetLogs.SendRequestAsync(filter);
+
+                if (logs.Length > 0)
+                {
+                    var events = depositEvent.DecodeAllEventsForEvent(logs);
+
+                    foreach (var e in events)
+                    {
+                        await ProcessDepositAsync(
+                            e.Event.User,
+                            e.Event.Amount,
+                            e.Log.TransactionHash);
+                    }
+                }
+
+                _lastProcessedBlock = toBlock;
+
+                _logger.LogInformation(
+                    "Processed blocks {From} → {To}",
+                    fromBlock,
+                    toBlock);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Worker Error");
+                _logger.LogError("Worker error: {Error}", ex.Message);
+                await Task.Delay(8000, stoppingToken);
             }
 
-            await Task.Delay(10000, stoppingToken);
+            await Task.Delay(2000, stoppingToken);
         }
     }
 
-    private async Task ProcessDepositAsync(string userAddress, BigInteger amountWei)
+    private async Task ProcessDepositAsync(
+        string userAddress,
+        BigInteger amountWei,
+        string txHash)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var balanceRepo = scope.ServiceProvider.GetRequiredService<IBalanceRepository>();
-        var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
 
-        var user = await userRepo.GetByAddressAsync(userAddress);
-        if (user == null)
-            user = await userRepo.CreateAsync(userAddress);
+            var balanceRepo = scope.ServiceProvider.GetRequiredService<IBalanceRepository>();
+            var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
-        decimal amountEth = (decimal)amountWei / 1_000_000_000_000_000_000m;
+            var address = userAddress.ToLowerInvariant();
 
-        await balanceRepo.DepositAsync(user.Id, "ETH", amountEth);
+            var user = await userRepo.GetByAddressAsync(address)
+                       ?? await userRepo.CreateAsync(address);
 
-        _logger.LogInformation("[Worker] Deposited {Amount} ETH for {Address}", amountEth, userAddress);
+            var amountEth = Web3.Convert.FromWei(amountWei);
+
+            await balanceRepo.DepositAsync(user.Id, "ETH", amountEth);
+
+            _logger.LogInformation(
+                "DEPOSIT: {Amount} ETH → {Address} | Tx {Tx}",
+                amountEth,
+                address,
+                txHash);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                "ProcessDeposit failed. Tx={Tx}, Error={Error}",
+                txHash,
+                ex.Message);
+        }
     }
 }
