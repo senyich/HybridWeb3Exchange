@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Orders/create": {
+    "/api/orders/create": {
       "post": {
         "tags": [
           "Orders"
@@ -42,25 +42,25 @@
       "OrderDto": {
         "type": "object",
         "properties": {
-          "makerAddress": {
+          "maker": {
             "type": "string",
             "nullable": true
-          },
-          "amount": {
-            "type": "number",
-            "format": "double"
-          },
-          "price": {
-            "type": "number",
-            "format": "double"
           },
           "side": {
             "type": "string",
             "nullable": true
           },
+          "amount": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "string",
+            "nullable": true
+          },
           "nonce": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string",
+            "nullable": true
           },
           "signature": {
             "type": "string",

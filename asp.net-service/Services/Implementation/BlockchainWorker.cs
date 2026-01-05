@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-[Event("DepositETH")]
+[Event("Deposit")]
 public class DepositEthEventDTO : IEventDTO
 {
     [Parameter("address", "user", 1, true)]

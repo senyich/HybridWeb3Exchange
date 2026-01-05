@@ -7,7 +7,6 @@ public class BalanceRepository : IBalanceRepository
 {
     private readonly AppDbContext _context;
     public BalanceRepository(AppDbContext context) => _context = context;
-
     public async Task<Balance?> GetBalanceAsync(int userId, string currency) =>
         await _context.Balances.FirstOrDefaultAsync(b => b.UserId == userId && b.Currency == currency);
 

@@ -1,4 +1,6 @@
-﻿using asp.net_service.Dtos;
+﻿using System.Numerics;
+using System.Globalization;
+using asp.net_service.Dtos;
 using asp.net_service.Entities;
 using asp.net_service.Persistance;
 using asp.net_service.Persistance.IRepositories;
@@ -24,8 +26,17 @@ public class OrderService : IOrderService
 
     public async Task<(bool Success, string Message)> PlaceOrderAsync(OrderDto dto)
     {
-        if (dto.Amount <= 0 || dto.Price <= 0)
+        if (string.IsNullOrWhiteSpace(dto.Amount) || string.IsNullOrWhiteSpace(dto.Price))
+            return (false, "Amount and Price are required");
+
+        if (!TryParseBigInteger(dto.Amount, out BigInteger amountWei) || !TryParseBigInteger(dto.Price, out BigInteger priceWei))
+            return (false, "Invalid Amount or Price format");
+
+        if (amountWei.Sign <= 0 || priceWei.Sign <= 0)
             return (false, "Amount and Price must be positive");
+
+        decimal amount = (decimal)amountWei / 1_000_000_000_000_000_000m;
+        decimal price = (decimal)priceWei / 1_000_000_000_000_000_000m;
 
         var user = await _userRepo.GetByAddressAsync(dto.Maker);
         if (user == null) return (false, "User not found. Please deposit funds first.");
@@ -34,7 +45,7 @@ public class OrderService : IOrderService
         try
         {
             string currencyToLock = dto.Side == "Buy" ? "USDT" : "ETH";
-            decimal amountToLock = dto.Side == "Buy" ? (dto.Amount * dto.Price) : dto.Amount;
+            decimal amountToLock = dto.Side == "Buy" ? (amount * price) : amount;
 
             var balance = await _balanceRepo.GetBalanceAsync(user.Id, currencyToLock);
 
@@ -48,9 +59,9 @@ public class OrderService : IOrderService
             {
                 UserId = user.Id,
                 Side = dto.Side == "Buy" ? OrderSide.Buy : OrderSide.Sell,
-                Price = dto.Price,
-                InitialAmount = dto.Amount,
-                RemainingAmount = dto.Amount,
+                Price = price,
+                InitialAmount = amount,
+                RemainingAmount = amount,
                 Signature = dto.Signature
             };
 
@@ -64,5 +75,29 @@ public class OrderService : IOrderService
             await transaction.RollbackAsync();
             return (false, $"Internal error: {ex.Message}");
         }
+    }
+
+    private static bool TryParseBigInteger(string value, out BigInteger result)
+    {
+        result = BigInteger.Zero;
+        if (string.IsNullOrWhiteSpace(value)) return false;
+
+        value = value.Trim();
+        try
+        {
+            if (value.StartsWith("0x") || value.StartsWith("0X"))
+            {
+                var hex = value.Substring(2);
+                result = BigInteger.Parse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                return true;
+            }
+
+            if (BigInteger.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out result))
+                return true;
+        }
+        catch
+        {
+        }
+        return false;
     }
 }
