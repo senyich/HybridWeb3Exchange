@@ -3,12 +3,12 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title ExchangeBase
  * @dev Minimal AMM to swap ETH <-> ERC20 token (constant product) with 0.3% fee.
- *      Uses SafeERC20 and protects against reentrancy.
+ * Uses SafeERC20 and protects against reentrancy.
  */
 contract ExchangeBase is ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -42,7 +42,8 @@ contract ExchangeBase is ReentrancyGuard {
         require(tokenAmount > 0, "zero token");
 
         if (totalLiquidity == 0) {
-            token.safeTransferFrom(msg.sender, addrwess(this), tokenAmount);
+            // ИСПРАВЛЕНО: addrwess -> address
+            token.safeTransferFrom(msg.sender, address(this), tokenAmount);
             liquidityMinted = msg.value;
             liquidity[msg.sender] = liquidityMinted;
             totalLiquidity = liquidityMinted;
