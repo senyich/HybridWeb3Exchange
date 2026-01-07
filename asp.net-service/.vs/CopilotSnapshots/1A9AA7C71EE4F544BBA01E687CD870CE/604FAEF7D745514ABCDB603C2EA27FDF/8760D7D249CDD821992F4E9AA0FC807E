@@ -1,0 +1,219 @@
+﻿using asp.net_service.Persistance.IRepositories;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.Contracts;
+using Nethereum.Hex.HexTypes;
+using Nethereum.Model;
+using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Web3;
+using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
+namespace asp.net_service.Services.Implementation;
+
+// ИСПРАВЛЕННЫЙ DTO: добавлена четкая структура для Nethereum
+[Event("Deposit")]
+public class DepositEthEventDTO : IEventDTO
+{
+    // Indexed параметр (Topic)
+    [Parameter("address", "user", 1, true)]
+    public string User { get; set; }
+
+    // Data параметр
+    [Parameter("uint256", "amount", 2, false)]
+    public BigInteger Amount { get; set; }
+}
+
+public class BlockchainWorker : BackgroundService
+{
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger<BlockchainWorker> _logger;
+    private readonly string _rpcUrl;
+    private readonly string _contractAddress;
+
+    private const int MaxBlockRange = 500;
+    private BigInteger _lastProcessedBlock;
+
+    public BlockchainWorker(IServiceScopeFactory scopeFactory, IConfiguration configuration, ILogger<BlockchainWorker> logger)
+    {
+        _scopeFactory = scopeFactory;
+        _logger = logger;
+        _rpcUrl = configuration.GetValue<string>("Blockchain:RpcUrl")!;
+        _contractAddress = configuration.GetValue<string>("Blockchain:ContractAddress")!;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        var web3 = new Web3(_rpcUrl);
+
+        try
+        {
+            var currentBlockObj = await RetryRpcAsync(
+                () => web3.Eth.Blocks.GetBlockNumber.SendRequestAsync(),
+                attempts: 5,
+                initialDelayMs: 500);
+
+            _lastProcessedBlock = currentBlockObj.Value - 50;
+            if (_lastProcessedBlock < 0) _lastProcessedBlock = 0;
+            _logger.LogInformation($"Worker started. RPC: {_rpcUrl.Substring(0, 20)}... Contract: {_contractAddress}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical($"RPC Connection Error: {ex.Message}");
+            return;
+        }
+
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                var latestBlockObj = await RetryRpcAsync(
+                    () => web3.Eth.Blocks.GetBlockNumber.SendRequestAsync(),
+                    attempts: 5,
+                    initialDelayMs: 300);
+
+                var latestBlock = latestBlockObj.Value;
+
+                if (_lastProcessedBlock >= latestBlock)
+                {
+                    await Task.Delay(10000, stoppingToken);
+                    continue;
+                }
+
+                var toBlock = (_lastProcessedBlock + MaxBlockRange) < latestBlock ? (_lastProcessedBlock + MaxBlockRange) : latestBlock;
+
+                // Попытка получить логи с адаптивным уменьшением диапазона при ошибках провайдера
+                var success = false;
+                var currentFrom = _lastProcessedBlock + 1;
+                var currentTo = toBlock;
+                var range = (int)(currentTo - currentFrom + 1);
+
+                while (!success && range > 0)
+                {
+                    var filter = new NewFilterInput()
+                    {
+                        FromBlock = new BlockParameter(new HexBigInteger(currentFrom)),
+                        ToBlock = new BlockParameter(new HexBigInteger(currentTo)),
+                        Address = new[] { _contractAddress }
+                    };
+
+                    try
+                    {
+                        var logs = await RetryRpcAsync(
+                            () => web3.Eth.Filters.GetLogs.SendRequestAsync(filter),
+                            attempts: 3,
+                            initialDelayMs: 500);
+
+                        if (logs != null && logs.Length > 0)
+                        {
+                            var depositEvents = web3.Eth.GetEvent<DepositEthEventDTO>().DecodeAllEventsForEvent(logs);
+                            var tasks = new List<Task>();
+
+                            foreach (var e in depositEvents)
+                            {
+                                // используем e.Log.TransactionHash, т.к. сопоставление через IndexOf было ненадёжным
+                                var txHash = e.Log?.TransactionHash;
+                                if (txHash == null)
+                                {
+                                    _logger.LogWarning("Event without transaction hash encountered, skipping.");
+                                    continue;
+                                }
+
+                                tasks.Add(ProcessDepositAsync(
+                                    e.Event.User,
+                                    e.Event.Amount,
+                                    txHash));
+                            }
+
+                            try
+                            {
+                                await Task.WhenAll(tasks);
+                            }
+                            catch (Exception exTasks)
+                            {
+                                _logger.LogError($"Error processing events: {exTasks.Message}");
+                            }
+                        }
+
+                        success = true;
+                        _lastProcessedBlock = currentTo;
+                        _logger.LogDebug($"Processed up to block {currentTo}");
+                    }
+                    catch (Exception exLogs)
+                    {
+                        // если провайдер жалуется на слишком большой диапазон, уменьшаем его и пробуем снова
+                        _logger.LogWarning($"GetLogs failed for {currentFrom}-{currentTo}: {exLogs.Message}. Shrinking range and retrying.");
+                        // уменьшаем range в 2 раза, но не меньше 1
+                        range = Math.Max(1, range / 2);
+                        currentTo = currentFrom + range - 1;
+                        // небольшая пауза перед следующим запросом
+                        await Task.Delay(1000, stoppingToken);
+                    }
+                }
+
+                if (!success)
+                {
+                    // если ни одна попытка не увенчалась успехом, логируем и сдвигаем lastProcessedBlock на toBlock,
+                    // чтобы не застрять навсегда; можно изменить политику при необходимости
+                    _logger.LogError($"Unable to fetch logs for blocks {_lastProcessedBlock + 1}..{toBlock} after retries. Skipping to {toBlock}.");
+                    _lastProcessedBlock = toBlock;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Log fetch error: {ex.Message}");
+                await Task.Delay(15000, stoppingToken);
+            }
+
+            await Task.Delay(5000, stoppingToken);
+        }
+    }
+
+    private async Task<T> RetryRpcAsync<T>(Func<Task<T>> action, int attempts = 3, int initialDelayMs = 200)
+    {
+        var delay = initialDelayMs;
+        for (var attempt = 1; attempt <= attempts; attempt++)
+        {
+            try
+            {
+                return await action();
+            }
+            catch (Exception ex) when (attempt < attempts)
+            {
+                _logger.LogWarning($"RPC attempt {attempt} failed: {ex.Message}. Retrying in {delay}ms.");
+                await Task.Delay(delay);
+                delay *= 2;
+            }
+        }
+
+        // Последняя попытка — не в блоке catch, чтобы исключение поднялось вверх
+        return await action();
+    }
+
+    private async Task ProcessDepositAsync(string userAddress, BigInteger amountWei, string txHash)
+    {
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var balanceRepo = scope.ServiceProvider.GetRequiredService<IBalanceRepository>();
+            var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+
+            var normalizedAddress = userAddress.ToLower();
+            var user = await userRepo.GetByAddressAsync(normalizedAddress) ?? await userRepo.CreateAsync(normalizedAddress);
+
+            decimal amountEth = (decimal)amountWei / 1_000_000_000_000_000_000m;
+            await balanceRepo.DepositAsync(user.Id, "ETH", amountEth);
+
+            _logger.LogInformation($"!!! DEPOSIT DETECTED !!! {amountEth} ETH for {normalizedAddress} (Tx: {txHash})");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"ProcessDepositAsync failed for tx {txHash}: {ex.Message}");
+        }
+    }
+}

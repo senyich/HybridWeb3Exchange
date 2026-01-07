@@ -37,8 +37,7 @@ public class BlockchainWorker : BackgroundService
     private readonly string _rpcUrl;
     private readonly string _contractAddress;
 
-    private const int MaxBlockRange = 100;
-    private BigInteger _lastProcessedBlock;
+    private HexBigInteger? _filterId;
 
     public BlockchainWorker(
         IServiceScopeFactory scopeFactory,
@@ -54,23 +53,28 @@ public class BlockchainWorker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var web3 = new Web3(_rpcUrl);
-
         var depositEvent = web3.Eth.GetEvent<DepositEthEventDTO>(_contractAddress);
 
         try
         {
-            var currentBlock = await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
+            var latestBlock = (await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync()).Value;
 
-            _lastProcessedBlock = 0;
+            var fromBlock = new HexBigInteger(
+                latestBlock > 5 ? latestBlock - 5 : latestBlock);
+
+            _filterId = await depositEvent.CreateFilterAsync<DepositEthEventDTO>(
+                default(DepositEthEventDTO),
+                new BlockParameter(fromBlock),
+                BlockParameter.CreateLatest());
 
             _logger.LogInformation(
-                "BlockchainWorker started. Contract={Contract}, StartBlock={Block}",
-                _contractAddress,
-                _lastProcessedBlock);
+                "Deposit filter created. FromBlock={Block}, FilterId={FilterId}",
+                fromBlock.Value,
+                _filterId.Value);
         }
         catch (Exception ex)
         {
-            _logger.LogCritical("RPC connection failed: {Error}", ex.Message);
+            _logger.LogCritical("Failed to create filter: {Error}", ex.Message);
             return;
         }
 
@@ -78,53 +82,51 @@ public class BlockchainWorker : BackgroundService
         {
             try
             {
-                var latestBlock = (await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync()).Value;
+                var changes = await depositEvent.GetFilterChangesAsync(_filterId);
 
-                if (_lastProcessedBlock >= latestBlock)
+                foreach (var e in changes)
                 {
-                    await Task.Delay(5000, stoppingToken);
-                    continue;
+                    await ProcessDepositAsync(
+                        e.Event.User,
+                        e.Event.Amount,
+                        e.Log.TransactionHash);
                 }
-
-                var fromBlock = _lastProcessedBlock + 1;
-                var toBlock = BigInteger.Min(
-                    _lastProcessedBlock + MaxBlockRange,
-                    latestBlock);
-
-                var filter = depositEvent.CreateFilterInput(
-                    new BlockParameter(new HexBigInteger(fromBlock)),
-                    new BlockParameter(new HexBigInteger(toBlock))
-                );
-
-                var logs = await web3.Eth.Filters.GetLogs.SendRequestAsync(filter);
-
-                if (logs.Length > 0)
-                {
-                    var events = depositEvent.DecodeAllEventsForEvent(logs);
-
-                    foreach (var e in events)
-                    {
-                        await ProcessDepositAsync(
-                            e.Event.User,
-                            e.Event.Amount,
-                            e.Log.TransactionHash);
-                    }
-                }
-
-                _lastProcessedBlock = toBlock;
-
-                _logger.LogInformation(
-                    "Processed blocks {From} → {To}",
-                    fromBlock,
-                    toBlock);
             }
             catch (Exception ex)
             {
-                _logger.LogError("Worker error: {Error}", ex.Message);
-                await Task.Delay(8000, stoppingToken);
+                _logger.LogError("Filter polling error: {Error}", ex.Message);
+
+                await RecreateFilterAsync(web3, depositEvent);
             }
 
-            await Task.Delay(2000, stoppingToken);
+            await Task.Delay(3000, stoppingToken);
+        }
+    }
+
+    private async Task RecreateFilterAsync(
+        Web3 web3,
+        Event<DepositEthEventDTO> depositEvent)
+    {
+        try
+        {
+            var latestBlock = (await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync()).Value;
+
+            var fromBlock = new HexBigInteger(
+                latestBlock > 3 ? latestBlock - 3 : latestBlock);
+
+            _filterId = await depositEvent.CreateFilterAsync<DepositEthEventDTO>(
+                default(DepositEthEventDTO),
+                new BlockParameter(fromBlock),
+                BlockParameter.CreateLatest());
+
+            _logger.LogWarning(
+                "Deposit filter recreated. FromBlock={Block}, FilterId={FilterId}",
+                fromBlock.Value,
+                _filterId!.Value);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("Filter recreation failed: {Error}", ex.Message);
         }
     }
 

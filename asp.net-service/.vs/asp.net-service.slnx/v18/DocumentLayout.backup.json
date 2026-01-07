@@ -100,7 +100,7 @@
               "RelativeDocumentMoniker": "Services\\Implementation\\BlockchainWorker.cs",
               "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Services\\Implementation\\BlockchainWorker.cs*",
               "RelativeToolTip": "Services\\Implementation\\BlockchainWorker.cs*",
-              "ViewState": "AgIAAIMAAAAAAAAAAADwv5gAAAA+AAAAAAAAAA==",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAAADMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-04T12:48:39.83Z",
               "EditorCaption": ""
@@ -128,8 +128,7 @@
               "RelativeToolTip": "Services\\Implementation\\OrderService.cs",
               "ViewState": "AgIAAEMAAAAAAAAAAAAowGcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-04T07:25:56.299Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-04T07:25:56.299Z"
             },
             {
               "$type": "Document",
