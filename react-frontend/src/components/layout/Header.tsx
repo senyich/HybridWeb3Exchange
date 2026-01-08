@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Wallet, LayoutDashboard, ArrowRightLeft } from 'lucide-react';
+import { Menu, X, Hexagon, LayoutDashboard, ArrowRightLeft } from 'lucide-react';
 import { ConnectKitButton } from "connectkit";
 
 const Header = () => {
@@ -13,18 +13,23 @@ const Header = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-purple-500/20 bg-black/60 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40">
+    <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/80 backdrop-blur-md">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-10">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-deep to-crimson-deep shadow-neon-purple transition-transform group-hover:scale-110">
-                <Wallet className="h-6 w-6 text-white" />
-                <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20"></div>
+              <div className="relative flex items-center justify-center">
+                <Hexagon className="h-10 w-10 text-purple-neon fill-purple-neon/10 stroke-[1.5] group-hover:stroke-crimson-neon transition-colors duration-500" />
+                <div className="absolute inset-0 blur-lg bg-purple-neon/30 opacity-50 group-hover:opacity-100 transition-opacity" />
               </div>
-              <span className="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-neon via-fuchsia-500 to-crimson-neon group-hover:animate-pulse-glow">
-                Ru.HEX
-              </span>
+              <div className="flex flex-col">
+                <span className="text-xl font-black tracking-tighter text-white uppercase leading-none">
+                  Ru<span className="text-purple-neon">.</span>HEX
+                </span>
+                <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase group-hover:text-crimson-neon transition-colors">
+                  Protocol
+                </span>
+              </div>
             </Link>
 
             <div className="hidden md:flex items-center gap-1">
@@ -35,34 +40,41 @@ const Header = () => {
                     key={item.name}
                     to={item.href}
                     className={`
-                      flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-all duration-300
-                      ${isActive 
-                        ? 'bg-purple-500/10 text-purple-neon shadow-[0_0_15px_rgba(168,85,247,0.3)] border border-purple-500/30' 
-                        : 'text-gray-400 hover:text-white hover:bg-white/5'}
+                      relative flex items-center gap-2 px-5 py-2 text-sm font-bold uppercase tracking-wider transition-all duration-300
+                      ${isActive ? 'text-white' : 'text-gray-500 hover:text-gray-300'}
                     `}
                   >
-                    {item.icon}
-                    {item.name}
+                    {isActive && (
+                      <span className="absolute inset-0 bg-white/5 border border-white/5 rounded-sm -skew-x-12" />
+                    )}
+                    <span className="relative z-10 flex items-center gap-2">
+                      {item.icon}
+                      {item.name}
+                    </span>
                   </Link>
                 );
               })}
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
-            <div className="h-8 w-[1px] bg-gradient-to-b from-transparent via-purple-500/30 to-transparent"></div>
+          <div className="hidden md:flex items-center gap-6">
+            <div className="h-6 w-[1px] bg-white/10"></div>
             <ConnectKitButton.Custom>
               {({ isConnected, show, truncatedAddress, ensName }) => (
                 <button
                   onClick={show}
                   className={`
-                    px-6 py-2.5 rounded-xl font-bold transition-all duration-300 border
+                    group relative px-6 py-2.5 text-sm font-mono font-bold uppercase tracking-wide transition-all duration-300
+                    border overflow-hidden
                     ${isConnected 
-                      ? 'bg-purple-900/20 border-purple-500/50 text-purple-electric hover:shadow-neon-purple' 
-                      : 'bg-gradient-to-r from-purple-deep to-crimson-deep border-transparent text-white hover:scale-105 shadow-neon-red'}
+                      ? 'border-purple-500/30 bg-purple-500/5 text-purple-300 hover:border-purple-400' 
+                      : 'border-white/10 bg-white/5 text-gray-300 hover:border-crimson-neon/50 hover:text-white'}
                   `}
                 >
-                  {isConnected ? ensName ?? truncatedAddress : "Connect Wallet"}
+                   <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isConnected ? 'bg-purple-500/10' : 'bg-crimson-neon/10'}`} />
+                  <span className="relative z-10">
+                    {isConnected ? ensName ?? truncatedAddress : "Connect Wallet"}
+                  </span>
                 </button>
               )}
             </ConnectKitButton.Custom>
@@ -77,19 +89,19 @@ const Header = () => {
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden border-t border-purple-500/20 py-4 space-y-2 bg-black/90 backdrop-blur-xl absolute left-0 right-0 px-4 shadow-2xl">
+          <div className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl absolute left-0 right-0 py-4 px-4 shadow-2xl space-y-4">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:bg-purple-500/20 hover:text-purple-neon transition-colors"
+                className="flex items-center gap-3 px-4 py-3 border border-white/5 bg-white/5 text-gray-300 hover:border-purple-500/30 hover:text-white transition-all"
               >
                 {item.icon}
                 {item.name}
               </Link>
             ))}
-            <div className="pt-4 flex justify-center">
+            <div className="pt-2 flex justify-center">
                <ConnectKitButton />
             </div>
           </div>

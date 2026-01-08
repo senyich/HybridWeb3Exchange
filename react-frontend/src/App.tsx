@@ -9,15 +9,23 @@ import { Footer } from "./components/layout/Footer";
 
 function App() {
   return (
-    <div className="min-h-screen bg-blood-moon bg-[length:200%_200%] animate-gradient-shift text-white">
+    <div className="relative min-h-screen flex flex-col bg-background bg-grid-pattern bg-[length:40px_40px]">
+      <div className="absolute inset-0 bg-gradient-radial from-purple-dark/20 via-background to-background pointer-events-none fixed" />
+      
       <WagmiProvider config={wagmiConfiguration}>
         <QueryClientProvider client={queryClient}>
-          <ConnectKitProvider>
+          <ConnectKitProvider mode="dark" customTheme={{
+            "--ck-font-family": '"Inter", sans-serif',
+            "--ck-body-background": "#0F0518",
+            "--ck-border-radius": "12px",
+          }}>
             <BrowserRouter>
               <Header />
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-              </Routes>
+              <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                </Routes>
+              </main>
               <Footer />
             </BrowserRouter>
           </ConnectKitProvider>
@@ -26,6 +34,5 @@ function App() {
     </div>
   );
 }
-
 
 export default App;
