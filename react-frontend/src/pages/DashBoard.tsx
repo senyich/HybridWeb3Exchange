@@ -1,122 +1,195 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/static-components */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { useAccount, useReadContract, useBalance } from "wagmi";
-import { formatEther } from "viem";
+import { useAccount, useBalance, useReadContract, usePublicClient } from 'wagmi';
+import { formatEther, formatUnits } from "viem";
 import { ConnectKitButton } from "connectkit";
-import { ExchangeBaseABI } from "../config/contractsAbis";
+import { EXCHANGE_BASE_ABI, ERC20_MIN_ABI } from "../config/contractsAbis";
 
-const CONTRACT_ADDRESS = import.meta.env.VITE_EXCHANGE_CONTRACT_ADDRESS as `0x${string}`;
+const EXCHANGE_ADDRESS = import.meta.env
+  .VITE_EXCHANGE_CONTRACT_ADDRESS as `0x${string}`;
+const TOKEN_ADDRESS = import.meta.env
+  .VITE_TOPCOIN_CONTRACT_ADDRESS as `0x${string}`;
 
 export const Dashboard = () => {
   const { address, isConnected } = useAccount();
+  const provider = usePublicClient();
 
-  const { data: walletBalance } = useBalance({
-    address: address,
+  const { data: nativeBalance } = useBalance({ address });
+
+  const { data: tokenSymbol } = useReadContract({
+    address: TOKEN_ADDRESS,
+    abi: ERC20_MIN_ABI,
+    functionName: "symbol",
+  });
+  const { data: tokenDecimals } = useReadContract({
+    address: TOKEN_ADDRESS,
+    abi: ERC20_MIN_ABI,
+    functionName: "decimals",
+  });
+  const { data: tokenBalanceRaw } = useReadContract({
+    address: TOKEN_ADDRESS,
+    abi: ERC20_MIN_ABI,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
   });
 
-  const { data: totalLiquidity } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: ExchangeBaseABI,
-    functionName: "getContractTotalBalance",
+  const { data: reserveETH } = useReadContract({
+    address: EXCHANGE_ADDRESS,
+    abi: EXCHANGE_BASE_ABI,
+    functionName: "reserveETH",
+  });
+  const { data: reserveToken } = useReadContract({
+    address: EXCHANGE_ADDRESS,
+    abi: EXCHANGE_BASE_ABI,
+    functionName: "reserveToken",
+  });
+  const { data: userLiquidityRaw } = useReadContract({
+    address: EXCHANGE_ADDRESS,
+    abi: EXCHANGE_BASE_ABI,
+    functionName: "liquidity",
+    args: address ? [address] : undefined,
+  });
+  const { data: totalLiquidityRaw } = useReadContract({
+    address: EXCHANGE_ADDRESS,
+    abi: EXCHANGE_BASE_ABI,
+    functionName: "totalLiquidity",
   });
 
-  const displayWalletBalance = walletBalance?.value 
-    ? parseFloat(formatEther(walletBalance.value)).toFixed(4) 
+  const formatNative = (raw: any) =>
+    raw ? parseFloat(formatEther(raw)).toFixed(4) : "0.0000";
+  const tokenDecimalsNum = tokenDecimals ?? 18;
+  const formatToken = (raw: any) => {
+    try {
+      if (!raw) return "0.0";
+      return parseFloat(
+        formatUnits(raw as bigint, Number(tokenDecimalsNum))
+      ).toFixed(4);
+    } catch (e) {
+      return "0.0";
+    }
+  };
+
+  const displayNative = formatNative(nativeBalance?.value);
+  const displayToken = formatToken(tokenBalanceRaw);
+  const displayReserveETH = reserveETH
+    ? parseFloat(formatEther(reserveETH)).toFixed(4)
+    : "0.0000";
+  const displayReserveToken = formatToken(reserveToken);
+  const displayUserLiquidity = userLiquidityRaw
+    ? parseFloat(formatEther(userLiquidityRaw)).toFixed(4)
+    : "0.0000";
+  const displayTotalLiquidity = totalLiquidityRaw
+    ? parseFloat(formatEther(totalLiquidityRaw)).toFixed(4)
     : "0.0000";
 
-  const displayTotalLiquidity = totalLiquidity !== undefined 
-    ? parseFloat(formatEther(totalLiquidity)).toFixed(2) 
-    : "0.00";
-
-  const StatCard = ({ title, value, unit, glowColor = "purple" }: any) => (
-    <div className={`bg-custom-violet-night p-6 rounded-2xl border border-purple-dark shadow-neon-${glowColor} transition-all duration-300 hover:scale-[1.02]`}>
-      <h3 className="text-purple-electric text-xs font-bold uppercase tracking-[0.2em] mb-4 opacity-80">
-        {title}
-      </h3>
-      <div className="flex items-baseline gap-2">
-        <span className="text-4xl font-mono font-bold tracking-tighter text-white">
-          {value}
-        </span>
-        <span className="text-purple-light text-sm font-semibold uppercase">{unit}</span>
+  const Stat = ({
+    label,
+    value,
+    unit,
+  }: {
+    label: string;
+    value: string;
+    unit?: string;
+  }) => (
+    <div className="p-4 bg-slate-900/40 rounded-lg border border-slate-700">
+      <div className="text-xs text-slate-300 uppercase tracking-wide">
+        {label}
+      </div>
+      <div className="mt-2 font-mono text-2xl text-white">
+        {value} <span className="text-sm text-slate-400">{unit}</span>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-dark-radial text-white p-6 md:p-12 font-sans selection:bg-purple-deep">
-      <nav className="max-w-7xl mx-auto flex justify-between items-center mb-16">
-        <div className="relative group">
-          <h1 className="text-4xl font-black tracking-tighter italic text-transparent bg-clip-text bg-neon-glow animate-pulse-glow">
-            Ru.HEX
-          </h1>
-          <div className="absolute -bottom-2 left-0 w-0 h-1 bg-purple-neon transition-all duration-500 group-hover:w-full shadow-neon-purple"></div>
-        </div>
-        <div className="scale-110">
+    <div className="min-h-screen p-6 bg-black text-white">
+      <header className="max-w-5xl mx-auto flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <div>
           <ConnectKitButton />
         </div>
-      </nav>
+      </header>
 
-      <main className="max-w-7xl mx-auto space-y-10">
-        <header className="space-y-2">
-          <h2 className="text-5xl font-extrabold tracking-tight">
-            Personal <span className="text-purple-electric italic">Cabinet</span>
-          </h2>
-          <p className="text-purple-light/60 font-medium">Monitoring hybrid liquidity and asset distribution</p>
-        </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <StatCard 
-            title="External Wallet" 
-            value={displayWalletBalance} 
-            unit="ETH"
-            glowColor="purple"
+      <main className="max-w-5xl mx-auto space-y-6">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Stat label="Native Balance" value={displayNative} unit="ETH" />
+          <Stat
+            label={`Token Balance (${tokenSymbol ?? "TOKEN"})`}
+            value={displayToken}
+            unit={`${tokenSymbol ?? "TKN"}`}
           />
-
-          <StatCard 
-            title="Total Platform Liquidity" 
-            value={displayTotalLiquidity} 
-            unit="ETH"
-            glowColor="purple"
-          />
-        </div>
-
-        <section className="mt-12 overflow-hidden rounded-3xl border border-purple-dark/50 bg-black/20 backdrop-blur-xl">
-          <div className="p-8 border-b border-purple-dark/50 flex justify-between items-center">
-            <h3 className="text-xl font-bold italic tracking-wider">Asset Overview</h3>
-            <div className="flex gap-2">
-              <div className="h-2 w-2 rounded-full bg-purple-neon animate-pulse"></div>
-              <div className="h-2 w-2 rounded-full bg-crimson-neon animate-pulse delay-75"></div>
+          <div className="p-4 bg-slate-900/40 rounded-lg border border-slate-700">
+            <div className="text-xs text-slate-300 uppercase tracking-wide">
+              Addresses
+            </div>
+            <div className="mt-2 text-sm break-all">
+              <div>
+                <strong>Wallet:</strong> {address ?? "-"}
+              </div>
+              <div className="mt-2">
+                <strong>Token:</strong> {TOKEN_ADDRESS}
+              </div>
+              <div className="mt-2">
+                <strong>Exchange:</strong> {EXCHANGE_ADDRESS}
+              </div>
             </div>
           </div>
-          <div className="p-8">
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 bg-slate-900/40 rounded-lg border border-slate-700">
+            <h3 className="font-semibold">Pool / Exchange</h3>
+            <div className="mt-3 space-y-2 text-sm text-slate-200">
+              <div className="flex justify-between">
+                <span>Reserve (ETH)</span>
+                <span className="font-mono">{displayReserveETH} ETH</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Reserve (Token)</span>
+                <span className="font-mono">
+                  {displayReserveToken} {`${tokenSymbol ?? "TKN"}`}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Total Liquidity</span>
+                <span className="font-mono">{displayTotalLiquidity} LP</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 bg-slate-900/40 rounded-lg border border-slate-700">
+            <h3 className="font-semibold">Your Position</h3>
             {!isConnected ? (
-              <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-purple-dark/30 rounded-2xl">
-                <p className="text-purple-light/40 italic mb-4 text-lg">Identity not confirmed via Web3</p>
-                <ConnectKitButton />
+              <div className="mt-4 text-sm text-slate-300">
+                Connect your wallet to see position details.
               </div>
             ) : (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center p-4 rounded-xl bg-purple-dark/10 border border-purple-dark/20 hover:bg-purple-dark/20 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-deep to-crimson-neon flex items-center justify-center font-bold">Ξ</div>
-                    <div>
-                      <p className="font-bold">Ethereum (Native)</p>
-                      <p className="text-[10px] text-purple-light/50 font-mono break-all">{address}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-mono font-bold text-lg text-purple-electric">
-                      {displayWalletBalance}
-                    </p>
-                    <p className="text-[10px] uppercase tracking-tighter opacity-50">Available on Sepolia</p>
-                  </div>
+              <div className="mt-3 space-y-2 text-sm text-slate-200">
+                <div className="flex justify-between">
+                  <span>Wallet ETH</span>
+                  <span className="font-mono">{displayNative} ETH</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Wallet Token</span>
+                  <span className="font-mono">
+                    {displayToken} {`${tokenSymbol ?? "TKN"}`}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Your Liquidity</span>
+                  <span className="font-mono">{displayUserLiquidity} LP</span>
                 </div>
               </div>
             )}
           </div>
         </section>
+
+        <footer className="text-xs text-slate-400">
+          Data comes from the connected provider (Sepolia by default). Refreshes
+          on new blocks when supported by the provider.
+        </footer>
       </main>
     </div>
   );

@@ -5,7 +5,6 @@ import { queryClient, wagmiConfiguration } from "./config/wagmiConfig";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/layout/Header";
 import { Dashboard } from "./pages/DashBoard";
-import { CreateOrder } from "./components/CreateOrder";
 import { Footer } from "./components/layout/Footer";
 
 function App() {
@@ -17,8 +16,7 @@ function App() {
             <BrowserRouter>
               <Header />
               <Routes>
-                <Route path="/wallet" element={<Dashboard />} />
-                <Route path="/pasteOrder" element={<CreateOrder />} />
+                <Route path="/" element={<Dashboard />} />
               </Routes>
               <Footer />
             </BrowserRouter>

@@ -13,7 +13,7 @@ const wagmiConfiguration = createConfig(
       [sepolia.id]: http(),
     },
     walletConnectProjectId: "b1859eb4d0c0d7433f3343f083cb56c9",
-    appName: "Diploma Exchange",
+    appName: "Diplom Exchange",
     appDescription: "Hybrid Exchange Project",
   })
 );

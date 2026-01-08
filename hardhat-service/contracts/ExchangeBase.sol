@@ -42,7 +42,6 @@ contract ExchangeBase is ReentrancyGuard {
         require(tokenAmount > 0, "zero token");
 
         if (totalLiquidity == 0) {
-            // ИСПРАВЛЕНО: addrwess -> address
             token.safeTransferFrom(msg.sender, address(this), tokenAmount);
             liquidityMinted = msg.value;
             liquidity[msg.sender] = liquidityMinted;
