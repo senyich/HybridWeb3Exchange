@@ -4,8 +4,9 @@ import { ConnectKitProvider } from "connectkit";
 import { queryClient, wagmiConfiguration } from "./config/wagmiConfig";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/layout/Header";
-import { Dashboard } from "./pages/DashBoard";
+import { DashboardPage } from "./pages/DashBoardPage";
 import { Footer } from "./components/layout/Footer";
+import SwapPage from "./pages/SwapPage";
 
 function App() {
   return (
@@ -23,7 +24,8 @@ function App() {
               <Header />
               <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
                 <Routes>
-                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/" element={<DashboardPage />} />
+                  <Route path="/trade" element={<SwapPage />} />
                 </Routes>
               </main>
               <Footer />

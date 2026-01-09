@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import type { OrderPayload } from "./interfaces/orderPayload";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -11,14 +11,25 @@ const apiClient = axios.create({
   },
 });
 
-export const createOrder = async (orderData: OrderPayload) => {
-  const formattedPayload = {
-    ...orderData,
-    amount: orderData.amount.toString(),
-    price: orderData.price.toString(),
-    nonce: orderData.nonce.toString(),
-  };
+//TODO сделать получения курса с другого api
+export async function getEthPrice(vsCurrency = "usd"): Promise<number | null> {
+  try {
+    const resp = await axios.get(
+      "https://api.coingecko.com/api/v3/simple/price",
+      {
+        params: {
+          ids: "ethereum",
+          vs_currencies: vsCurrency,
+        },
+        timeout: 10_000,
+      }
+    );
 
-  const response = await apiClient.post("/api/orders/create", formattedPayload);
-  return response.data;
-};
+    const price = resp?.data?.ethereum?.[vsCurrency];
+    if (typeof price === "number") return price;
+    return null;
+  } catch (err) {
+    console.error("getEthPrice error:", err);
+    return null;
+  }
+}
