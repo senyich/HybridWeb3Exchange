@@ -1,27 +1,67 @@
 /* eslint-disable react-hooks/static-components */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useMemo } from "react";
-import { useAccount, useBalance, useReadContract } from 'wagmi';
+import { useState, useMemo } from "react";
+import { useAccount, useBalance, useReadContract } from "wagmi";
 import { formatEther, formatUnits } from "viem";
-import { EXCHANGE_BASE_ABI, ERC20_MIN_ABI } from "../config/contractsAbis";
-import { SUPPORTED_TOKENS, EXCHANGE_CONTRACT_ADDRESS } from "../config/constants";
-import { Wallet, Coins, Database, User, ShieldCheck, Activity, ChevronDown } from "lucide-react";
+import {
+  EXCHANGE_BASE_ABI,
+  ERC20_MIN_ABI,
+} from "../config/contractsAbis";
+import {
+  SUPPORTED_TOKENS,
+  EXCHANGE_CONTRACT_ADDRESS,
+} from "../config/constants";
+import {
+  Wallet,
+  Coins,
+  Database,
+  User,
+  ShieldCheck,
+  Activity,
+  ChevronDown,
+} from "lucide-react";
 import { Card } from "../components/Card";
 import { StatRow } from "../components/StatRow";
+import { Skeleton } from "../components/Skeleton";
+
+// Utility for clean number display
+const formatValue = (
+  raw: any,
+  decimals: number = 18,
+  maxFraction: number = 4
+) => {
+  if (raw === undefined || raw === null) return null; // Signal loading/missing
+  try {
+    const floatVal = parseFloat(formatUnits(raw, decimals));
+    return floatVal.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: maxFraction,
+    });
+  } catch {
+    return "0";
+  }
+};
 
 export const DashboardPage = () => {
   const { address, isConnected } = useAccount();
-  
-  const [selectedTokenAddr, setSelectedTokenAddr] = useState<`0x${string}`>(SUPPORTED_TOKENS[0].address);
 
-  const currentTokenConfig = useMemo(() => 
-    SUPPORTED_TOKENS.find(t => t.address === selectedTokenAddr) || SUPPORTED_TOKENS[0], 
-  [selectedTokenAddr]);
+  const [selectedTokenAddr, setSelectedTokenAddr] = useState<`0x${string}`>(
+    SUPPORTED_TOKENS[0].address
+  );
 
-  const { data: nativeBalance } = useBalance({ address });
+  const currentTokenConfig = useMemo(
+    () =>
+      SUPPORTED_TOKENS.find((t) => t.address === selectedTokenAddr) ||
+      SUPPORTED_TOKENS[0],
+    [selectedTokenAddr]
+  );
 
-  const { data: tokenSymbol } = useReadContract({
+  const { data: nativeBalance, isLoading: isNativeLoading } = useBalance({
+    address,
+  });
+
+  const { data: tokenSymbol, isLoading: isSymbolLoading } = useReadContract({
     address: selectedTokenAddr,
     abi: ERC20_MIN_ABI,
     functionName: "symbol",
@@ -33,169 +73,245 @@ export const DashboardPage = () => {
     functionName: "decimals",
   });
 
-  const { data: tokenBalanceRaw } = useReadContract({
-    address: selectedTokenAddr,
-    abi: ERC20_MIN_ABI,
-    functionName: "balanceOf",
-    args: address ? [address] : undefined,
-  });
+  const { data: tokenBalanceRaw, isLoading: isTokenBalanceLoading } =
+    useReadContract({
+      address: selectedTokenAddr,
+      abi: ERC20_MIN_ABI,
+      functionName: "balanceOf",
+      args: address ? [address] : undefined,
+    });
 
-  const { data: poolData } = useReadContract({
+  const { data: poolData, isLoading: isPoolLoading } = useReadContract({
     address: EXCHANGE_CONTRACT_ADDRESS,
     abi: EXCHANGE_BASE_ABI,
     functionName: "pools",
     args: [selectedTokenAddr],
   });
 
-  const { data: userLiquidityRaw } = useReadContract({
-    address: EXCHANGE_CONTRACT_ADDRESS,
-    abi: EXCHANGE_BASE_ABI,
-    functionName: "liquidity",
-    args: address ? [selectedTokenAddr, address] : undefined,
-  });
+  const { data: userLiquidityRaw, isLoading: isLiquidityLoading } =
+    useReadContract({
+      address: EXCHANGE_CONTRACT_ADDRESS,
+      abi: EXCHANGE_BASE_ABI,
+      functionName: "liquidity",
+      args: address ? [selectedTokenAddr, address] : undefined,
+    });
 
-  const ethReserve = poolData ? poolData[0] : BigInt(0);
-  const tokenReserve = poolData ? poolData[1] : BigInt(0);
-  const totalLiquidityRaw = poolData ? poolData[2] : BigInt(0);
+  const ethReserve = poolData ? poolData[0] : undefined;
+  const tokenReserve = poolData ? poolData[1] : undefined;
+  const totalLiquidityRaw = poolData ? poolData[2] : undefined;
 
-  const formatNative = (raw: any) =>
-    raw ? parseFloat(formatEther(raw)).toFixed(4) : "0.0000";
+  const tokenDecimalsNum = tokenDecimals ? Number(tokenDecimals) : 18;
 
-  const tokenDecimalsNum = tokenDecimals ?? 18;
-  const formatToken = (raw: any) => {
-    try {
-      if (!raw) return "0.0";
-      return parseFloat(
-        formatUnits(raw as bigint, Number(tokenDecimalsNum))
-      ).toFixed(4);
-    } catch (e) {
-      return "0.0";
-    }
-  };
+  const displayNative = formatValue(nativeBalance?.value, 18);
+  const displayToken = formatValue(tokenBalanceRaw, tokenDecimalsNum);
+  const displayReserveETH = formatValue(ethReserve, 18);
+  const displayReserveToken = formatValue(tokenReserve, tokenDecimalsNum);
+  const displayUserLiquidity = formatValue(userLiquidityRaw, 18);
+  const displayTotalLiquidity = formatValue(totalLiquidityRaw, 18);
 
-  const displayNative = formatNative(nativeBalance?.value);
-  const displayToken = formatToken(tokenBalanceRaw);
-  const displayReserveETH = parseFloat(formatEther(ethReserve)).toFixed(4);
-  const displayReserveToken = formatToken(tokenReserve);
-  const displayUserLiquidity = userLiquidityRaw
-    ? parseFloat(formatEther(userLiquidityRaw)).toFixed(4)
-    : "0.0000";
-  const displayTotalLiquidity = parseFloat(formatEther(totalLiquidityRaw)).toFixed(4);
   const activeSymbol = tokenSymbol ?? currentTokenConfig.symbol;
 
   return (
-    <div className="space-y-8 animate-fade-in pb-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+    <div className="space-y-8 animate-slide-up pb-12">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-black uppercase tracking-tighter text-white">Dashboard</h1>
-          <div className="flex items-center gap-2 text-xs font-mono text-gray-500">
-            <Activity className="w-3 h-3 text-green-500" />
-            <span>REAL-TIME DATA FEED</span>
+          <h1 className="text-4xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 drop-shadow-sm">
+            Dashboard
+          </h1>
+          <div className="flex items-center gap-2 text-xs font-mono text-purple-300/70 bg-purple-900/10 px-3 py-1 rounded-full border border-purple-500/10 w-fit">
+            <Activity className="w-3 h-3 text-green-400 animate-pulse" />
+            <span>LIVE NETWORK DATA</span>
           </div>
         </div>
-        <div className="relative group min-w-[200px]">
-            <label className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1 block">
-                Select token
-            </label>
-            <div className="relative">
-                <select 
-                    value={selectedTokenAddr}
-                    onChange={(e) => setSelectedTokenAddr(e.target.value as `0x${string}`)}
-                    className="w-full appearance-none bg-surface border border-white/10 text-white font-mono text-sm py-2 pl-3 pr-8 rounded focus:outline-none focus:border-purple-neon/50 focus:ring-1 focus:ring-purple-neon/50 transition-all cursor-pointer hover:bg-white/5"
+
+        <div className="relative group w-full md:w-64">
+          <label className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2 block pl-1">
+            Active Market
+          </label>
+          <div className="relative">
+            <select
+              value={selectedTokenAddr}
+              onChange={(e) =>
+                setSelectedTokenAddr(e.target.value as `0x${string}`)
+              }
+              className="w-full appearance-none bg-surface/80 backdrop-blur border border-white/10 text-white font-mono text-sm py-3 pl-4 pr-10 rounded-xl focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all cursor-pointer hover:bg-white/5 hover:border-white/20 shadow-lg"
+            >
+              {SUPPORTED_TOKENS.map((token) => (
+                <option
+                  key={token.address}
+                  value={token.address}
+                  className="bg-surface text-white py-2"
                 >
-                    {SUPPORTED_TOKENS.map((token) => (
-                        <option key={token.address} value={token.address} className="bg-background text-white">
-                            {token.name} ({token.symbol})
-                        </option>
-                    ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-            </div>
+                  {token.name} ({token.symbol})
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400 pointer-events-none group-hover:text-purple-300 transition-colors" />
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Card>
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-purple-900/10 rounded-lg border border-purple-500/10">
-                <Wallet className="w-5 h-5 text-purple-neon" />
+        <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <Card className="flex flex-col justify-between h-full group">
+            <div className="flex items-start justify-between mb-6">
+              <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/20 group-hover:border-purple-500/40 transition-colors">
+                <Wallet className="w-6 h-6 text-purple-400" />
               </div>
-              <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Wallet Balance</span>
+              <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest bg-white/5 px-2 py-1 rounded">
+                Wallet
+              </span>
             </div>
-            <div className="space-y-1">
-               <div className="text-3xl font-mono text-white tracking-tight">{displayNative}</div>
-               <div className="text-xs text-gray-500 uppercase font-bold tracking-wider">ETH (Native)</div>
+            <div className="space-y-2">
+              {isNativeLoading ? (
+                <Skeleton className="w-32 h-10" />
+              ) : (
+                <div className="text-4xl font-mono text-white tracking-tight font-medium">
+                  {displayNative}
+                </div>
+              )}
+              <div className="text-xs text-purple-300/50 uppercase font-bold tracking-wider pl-0.5">
+                ETH Balance
+              </div>
             </div>
           </Card>
 
-          <Card>
-             <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-crimson-blood/10 rounded-lg border border-crimson-neon/10">
-                <Coins className="w-5 h-5 text-crimson-neon" />
+          <Card className="flex flex-col justify-between h-full group">
+            <div className="flex items-start justify-between mb-6">
+              <div className="p-3 bg-crimson-blood/20 rounded-xl border border-crimson-neon/20 group-hover:border-crimson-neon/40 transition-colors">
+                <Coins className="w-6 h-6 text-crimson-neon" />
               </div>
-              <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Token Balance</span>
+              <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest bg-white/5 px-2 py-1 rounded">
+                Wallet
+              </span>
             </div>
-            <div className="space-y-1">
-               <div className="text-3xl font-mono text-white tracking-tight">{displayToken}</div>
-               <div className="text-xs text-gray-500 uppercase font-bold tracking-wider">{`${activeSymbol}`}</div>
+            <div className="space-y-2">
+              {isTokenBalanceLoading || isSymbolLoading ? (
+                <Skeleton className="w-32 h-10" />
+              ) : (
+                <div className="text-4xl font-mono text-white tracking-tight font-medium">
+                  {displayToken}
+                </div>
+              )}
+              <div className="text-xs text-crimson-300/50 uppercase font-bold tracking-wider pl-0.5">
+                {activeSymbol} Balance
+              </div>
             </div>
           </Card>
         </div>
 
-        <Card className="md:col-span-4 flex flex-col justify-center">
-            <div className="flex items-center gap-2 mb-6 text-gray-400">
-                <ShieldCheck className="w-4 h-4" />
-                <span className="text-xs font-bold uppercase tracking-wider">Active Contract Data</span>
-            </div>
-            <div className="space-y-4">
-                <div className="group">
-                    <div className="text-[10px] text-gray-600 uppercase tracking-widest mb-1">Exchange Contract</div>
-                    <div className="font-mono text-xs text-purple-300/80 truncate bg-purple-900/10 p-2 border border-purple-500/10 rounded group-hover:border-purple-500/30 transition-colors">
-                        {EXCHANGE_CONTRACT_ADDRESS}
-                    </div>
+        <Card className="md:col-span-4 flex flex-col justify-center gap-6">
+          <div className="flex items-center gap-2 pb-4 border-b border-white/5">
+            <ShieldCheck className="w-5 h-5 text-gray-400" />
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-300">
+              Contract Details
+            </span>
+          </div>
+          <div className="space-y-5">
+            <div className="group">
+              <div className="flex justify-between items-center mb-1.5">
+                <div className="text-[10px] text-gray-500 uppercase tracking-widest">
+                  Exchange
                 </div>
-                <div className="group">
-                    <div className="text-[10px] text-gray-600 uppercase tracking-widest mb-1">Current Token Pool</div>
-                    <div className="font-mono text-xs text-crimson-300/80 truncate bg-crimson-blood/10 p-2 border border-crimson-neon/10 rounded group-hover:border-crimson-neon/30 transition-colors">
-                        {selectedTokenAddr}
-                    </div>
-                </div>
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+              </div>
+              <div className="font-mono text-[11px] text-purple-200/90 truncate bg-purple-900/20 p-2.5 border border-purple-500/20 rounded-lg group-hover:border-purple-500/40 transition-all select-all">
+                {EXCHANGE_CONTRACT_ADDRESS}
+              </div>
             </div>
+            <div className="group">
+              <div className="flex justify-between items-center mb-1.5">
+                <div className="text-[10px] text-gray-500 uppercase tracking-widest">
+                  Token Asset
+                </div>
+                <div className="w-1.5 h-1.5 rounded-full bg-crimson-neon shadow-[0_0_8px_rgba(255,0,60,0.5)]" />
+              </div>
+              <div className="font-mono text-[11px] text-crimson-200/90 truncate bg-crimson-blood/20 p-2.5 border border-crimson-neon/20 rounded-lg group-hover:border-crimson-neon/40 transition-all select-all">
+                {selectedTokenAddr}
+              </div>
+            </div>
+          </div>
         </Card>
 
         <Card className="md:col-span-6">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
-                <Database className="w-5 h-5 text-purple-neon" />
-                <h3 className="text-lg font-bold text-white uppercase tracking-wide">Liquidity Pool</h3>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
+            <div className="p-2 bg-purple-500/10 rounded-lg">
+              <Database className="w-5 h-5 text-purple-neon" />
             </div>
-            <div className="space-y-1">
-                <StatRow label="Reserve ETH" value={displayReserveETH} unit="ETH" />
-                <StatRow label="Reserve Token" value={displayReserveToken} unit={activeSymbol as string} />
-                <StatRow label="Total Liquidity" value={displayTotalLiquidity} unit="LP" highlight />
+            <h3 className="text-lg font-bold text-white uppercase tracking-wide">
+              Liquidity Pool
+            </h3>
+          </div>
+          <div className="space-y-1">
+            <StatRow
+              label="Pooled ETH"
+              value={displayReserveETH || "0"}
+              unit="ETH"
+              isLoading={isPoolLoading}
+            />
+            <StatRow
+              label={`Pooled ${activeSymbol}`}
+              value={displayReserveToken || "0"}
+              unit={activeSymbol as string}
+              isLoading={isPoolLoading || isSymbolLoading}
+            />
+            <div className="mt-2">
+              <StatRow
+                label="Total Liquidity Tokens"
+                value={displayTotalLiquidity || "0"}
+                unit="LP"
+                highlight
+                isLoading={isPoolLoading}
+              />
             </div>
+          </div>
         </Card>
 
-        <Card className="md:col-span-6 relative group">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-neon/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5 relative z-10">
-                <User className="w-5 h-5 text-crimson-neon" />
-                <h3 className="text-lg font-bold text-white uppercase tracking-wide">Your Position</h3>
+        <Card className="md:col-span-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5 relative z-10">
+            <div className="p-2 bg-crimson-blood/20 rounded-lg">
+              <User className="w-5 h-5 text-crimson-neon" />
             </div>
-            {!isConnected ? (
-              <div className="h-40 flex flex-col items-center justify-center text-center p-4 relative z-10">
-                <span className="text-sm text-gray-400 mb-2">Wallet not connected</span>
-                <span className="text-xs text-gray-600">Connect to view your LP share</span>
+            <h3 className="text-lg font-bold text-white uppercase tracking-wide">
+              Your Position
+            </h3>
+          </div>
+
+          {!isConnected ? (
+            <div className="h-40 flex flex-col items-center justify-center text-center p-6 bg-white/5 rounded-xl border border-white/5 border-dashed relative z-10">
+              <span className="text-gray-400 font-medium mb-1">
+                Wallet Disconnected
+              </span>
+              <span className="text-xs text-gray-500 max-w-[200px]">
+                Connect your wallet to view your liquidity provider statistics.
+              </span>
+            </div>
+          ) : (
+            <div className="space-y-1 relative z-10">
+              <StatRow
+                label="Your ETH Share"
+                value={displayNative || "0"}
+                unit="ETH"
+                isLoading={isNativeLoading}
+              />
+              <StatRow
+                label={`Your ${activeSymbol} Share`}
+                value={displayToken || "0"}
+                unit={activeSymbol as string}
+                isLoading={isTokenBalanceLoading}
+              />
+              <div className="mt-4 pt-4 border-t border-dashed border-white/10">
+                <StatRow
+                  label="Your LP Tokens"
+                  value={displayUserLiquidity || "0"}
+                  unit="LP"
+                  highlight
+                  isLoading={isLiquidityLoading}
+                />
               </div>
-            ) : (
-              <div className="space-y-1 relative z-10">
-                 <StatRow label="Wallet ETH" value={displayNative} unit="ETH" />
-                 <StatRow label="Wallet Token" value={displayToken} unit={activeSymbol as string} />
-                 <div className="mt-4 pt-4 border-t border-dashed border-white/10">
-                    <StatRow label="Your Liquidity Share" value={displayUserLiquidity} unit="LP" highlight />
-                 </div>
-              </div>
-            )}
+            </div>
+          )}
         </Card>
       </div>
     </div>

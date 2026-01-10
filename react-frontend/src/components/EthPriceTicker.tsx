@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getEthPrice } from "../api";
+import { Skeleton } from "./Skeleton";
 
 type Prices = {
   usd: number | null;
@@ -18,7 +19,8 @@ export function EthPriceTicker() {
 
   const fetchPrices = async () => {
     try {
-      const [usd] = await Promise.all([getEthPrice("usd")]);
+      // Assuming getEthPrice returns a number
+      const usd = await getEthPrice("usd");
 
       if (usd !== null && prevUsdRef.current !== null) {
         if (usd > prevUsdRef.current) setDirection("up");
@@ -28,6 +30,8 @@ export function EthPriceTicker() {
 
       prevUsdRef.current = usd;
       setPrices({ usd });
+    } catch (e) {
+      console.error("Failed to fetch price", e);
     } finally {
       setLoading(false);
     }
@@ -48,43 +52,44 @@ export function EthPriceTicker() {
 
   const glow =
     direction === "up"
-      ? "drop-shadow-[0_0_16px_rgba(52,211,153,0.5)]"
+      ? "drop-shadow-[0_0_12px_rgba(52,211,153,0.6)]"
       : direction === "down"
-      ? "drop-shadow-[0_0_16px_rgba(255,0,60,0.5)]"
-      : "drop-shadow-[0_0_14px_rgba(176,38,255,0.4)]";
+      ? "drop-shadow-[0_0_12px_rgba(255,0,60,0.6)]"
+      : "drop-shadow-[0_0_10px_rgba(176,38,255,0.3)]";
 
   return (
-    <div className="rounded-2xl bg-surface/70 backdrop-blur-xl border border-purple-deep/40 shadow-glass px-8 py-6 flex items-center gap-8">
-      <div className="flex items-center gap-3">
-        <span className="text-purple-neon font-mono text-base tracking-widest">
-          ETH rate
+    <div className="rounded-xl bg-surface/40 backdrop-blur-md border border-white/10 px-5 py-3 flex items-center gap-6 shadow-lg hover:bg-surface/60 transition-colors">
+      <div className="flex items-center gap-2.5">
+        <div className="relative">
+          <div className="w-2.5 h-2.5 rounded-full bg-purple-neon animate-pulse" />
+          <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-purple-neon animate-ping opacity-75" />
+        </div>
+        <span className="text-gray-400 font-mono text-xs uppercase tracking-widest font-bold">
+          ETH/USD
         </span>
-        <span className="w-3 h-3 rounded-full bg-purple-neon animate-pulse shadow-neon-purple" />
       </div>
 
-      {loading ? (
-        <span className="text-white/60 text-base animate-pulse">
-          Loading price…
-        </span>
-      ) : (
-        <div className="flex flex-col leading-tight">
-          <div className="flex items-center gap-3">
-            <span
-              className={`text-3xl font-semibold transition-colors duration-300 ${priceColor} ${glow}`}
-            >
-              ${prices.usd?.toLocaleString("en-US")}
-            </span>
+      <div className="h-8 w-[1px] bg-white/10" />
 
-            {direction !== "same" && (
-              <span
-                className={`text-xl ${
-                  direction === "up" ? "text-emerald-400" : "text-crimson-neon"
-                }`}
-              >
-                {direction === "up" ? "▲" : "▼"}
-              </span>
-            )}
-          </div>
+      {loading ? (
+        <Skeleton className="w-24 h-8" />
+      ) : (
+        <div className="flex items-center gap-3">
+          <span
+            className={`text-2xl font-mono font-bold transition-all duration-500 ${priceColor} ${glow}`}
+          >
+            ${prices.usd?.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+          </span>
+
+          {direction !== "same" && (
+            <span
+              className={`text-lg animate-fade-in ${
+                direction === "up" ? "text-emerald-400" : "text-crimson-neon"
+              }`}
+            >
+              {direction === "up" ? "↗" : "↘"}
+            </span>
+          )}
         </div>
       )}
     </div>

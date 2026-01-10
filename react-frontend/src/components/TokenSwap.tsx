@@ -349,7 +349,6 @@ export function TokenSwap() {
       </div>
 
       <div className="p-6 space-y-2">
-        {/* INPUT FIELD */}
         <div className="bg-background/50 border border-white/5 rounded-2xl p-4 focus-within:border-purple-500/50 focus-within:ring-1 focus-within:ring-purple-500/50 transition-all hover:border-white/10">
           <div className="flex justify-between mb-3">
             <label className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
@@ -403,14 +402,12 @@ export function TokenSwap() {
           </div>
         </div>
 
-        {/* SWAP INDICATOR */}
         <div className="flex justify-center -my-3 relative z-10">
           <div className="p-1.5 rounded-xl bg-surface border border-white/10 shadow-lg">
             <ArrowDownUp className="w-4 h-4 text-purple-400" />
           </div>
         </div>
 
-        {/* OUTPUT FIELD */}
         <div className="bg-background/50 border border-white/5 rounded-2xl p-4 hover:border-white/10 transition-colors">
           <div className="flex justify-between mb-3">
             <label className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
@@ -455,7 +452,6 @@ export function TokenSwap() {
         </div>
       </div>
 
-      {/* DETAILS & ALERTS */}
       <div className="px-6 pb-6">
         <div className="mb-6 grid grid-cols-2 gap-3 text-xs">
           <div className="bg-slate-900/40 rounded-lg p-3 border border-white/5 flex flex-col justify-between">
