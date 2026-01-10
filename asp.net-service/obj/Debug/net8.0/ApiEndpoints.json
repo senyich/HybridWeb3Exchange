@@ -1,18 +1,1 @@
-[
-  {
-    "ContainingType": "asp.net_service.OrdersController",
-    "Method": "CreateOrderEip712",
-    "RelativePath": "api/orders/create",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "asp.net_service.Dtos.OrderDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  }
-]
+[]

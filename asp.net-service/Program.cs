@@ -1,7 +1,4 @@
 using asp.net_service.Persistance;
-using asp.net_service.Persistance.IRepositories;
-using asp.net_service.Persistance.Repositories;
-using asp.net_service.Services.Abstraction;
 using asp.net_service.Services.Implementation;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,12 +16,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
-
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IBalanceRepository, BalanceRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-
-builder.Services.AddTransient<IOrderService, OrderService>();
 
 builder.Services.AddHostedService<BlockchainWorker>();
 
