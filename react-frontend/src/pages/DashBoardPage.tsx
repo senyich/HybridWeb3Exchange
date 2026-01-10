@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
 import { useAccount, useBalance, useReadContract } from "wagmi";
-import { formatEther, formatUnits } from "viem";
+import { formatUnits } from "viem";
 import {
   EXCHANGE_BASE_ABI,
   ERC20_MIN_ABI,

@@ -11,8 +11,7 @@ import SwapPage from "./pages/SwapPage";
 function App() {
   return (
     <div className="relative min-h-screen flex flex-col bg-background bg-grid-pattern bg-[length:40px_40px]">
-      <div className="absolute inset-0 bg-gradient-radial from-purple-dark/20 via-background to-background pointer-events-none fixed" />
-      
+      <div className="absolute inset-0 bg-gradient-radial from-purple-dark/20 via-background to-background pointer-events-none fixed" />  
       <WagmiProvider config={wagmiConfiguration}>
         <QueryClientProvider client={queryClient}>
           <ConnectKitProvider mode="dark" customTheme={{

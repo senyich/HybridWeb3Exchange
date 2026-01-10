@@ -2,14 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
 
-const apiClient = axios.create({
-  baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
 
 //TODO сделать получения курса с другого api
 export async function getEthPrice(vsCurrency = "usd"): Promise<number | null> {
