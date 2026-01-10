@@ -28,7 +28,9 @@ export default {
           "linear-gradient(to right, #ffffff05 1px, transparent 1px), linear-gradient(to bottom, #ffffff05 1px, transparent 1px)",
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "glass-gradient":
-          "linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)",
+          "linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.01) 100%)",
+        "glass-shine":
+          "linear-gradient(45deg, transparent 25%, rgba(255,255,255,0.1) 50%, transparent 75%)",
       },
       boxShadow: {
         "neon-purple":
@@ -40,8 +42,9 @@ export default {
       animation: {
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         glow: "glow 2s ease-in-out infinite alternate",
-        shimmer: "shimmer 1.5s infinite",
-        "fade-in": "fadeIn 0.35s ease-out",
+        shimmer: "shimmer 2s linear infinite",
+        "fade-in": "fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+        "slide-up": "slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
       },
       keyframes: {
         glow: {
@@ -52,10 +55,15 @@ export default {
           },
         },
         shimmer: {
+          "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(100%)" },
         },
         fadeIn: {
-          "0%": { opacity: "0", transform: "translateY(6px)" },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        slideUp: {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
       },
