@@ -19,8 +19,7 @@ export function EthPriceTicker() {
 
   const fetchPrices = async () => {
     try {
-      // Assuming getEthPrice returns a number
-      const usd = await getEthPrice("usd");
+      const usd = await getEthPrice();
 
       if (usd !== null && prevUsdRef.current !== null) {
         if (usd > prevUsdRef.current) setDirection("up");

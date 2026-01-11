@@ -1,17 +1,12 @@
 /* eslint-disable react-hooks/static-components */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAccount, useBalance, useReadContract } from "wagmi";
 import { formatUnits } from "viem";
-import {
-  EXCHANGE_BASE_ABI,
-  ERC20_MIN_ABI,
-} from "../config/contractsAbis";
-import {
-  SUPPORTED_TOKENS,
-  EXCHANGE_CONTRACT_ADDRESS,
-} from "../config/constants";
+import { EXCHANGE_BASE_ABI, ERC20_MIN_ABI } from "../config/contractsAbis";
+import { EXCHANGE_CONTRACT_ADDRESS } from "../config/constants";
+import { getSymbolsAsync } from "../api";
 import {
   Wallet,
   Coins,
@@ -25,13 +20,12 @@ import { Card } from "../components/Card";
 import { StatRow } from "../components/StatRow";
 import { Skeleton } from "../components/Skeleton";
 
-// Utility for clean number display
 const formatValue = (
   raw: any,
   decimals: number = 18,
   maxFraction: number = 4
 ) => {
-  if (raw === undefined || raw === null) return null; // Signal loading/missing
+  if (raw === undefined || raw === null) return null;
   try {
     const floatVal = parseFloat(formatUnits(raw, decimals));
     return floatVal.toLocaleString("en-US", {
@@ -43,18 +37,58 @@ const formatValue = (
   }
 };
 
+interface Token {
+  name: string;
+  symbol: string;
+  address: `0x${string}`;
+}
+
 export const DashboardPage = () => {
   const { address, isConnected } = useAccount();
+  const [supportedTokens, setSupportedTokens] = useState<Token[]>([]);
+  const [isLoadingTokens, setIsLoadingTokens] = useState(true);
+
+  useEffect(() => {
+    const fetchTokens = async () => {
+      try {
+        const tokens = await getSymbolsAsync();
+        if (tokens && Array.isArray(tokens)) {
+          setSupportedTokens(tokens as Token[]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tokens:", error);
+      } finally {
+        setIsLoadingTokens(false);
+      }
+    };
+
+    fetchTokens();
+  }, []);
 
   const [selectedTokenAddr, setSelectedTokenAddr] = useState<`0x${string}`>(
-    SUPPORTED_TOKENS[0].address
+    "0x0000000000000000000000000000000000000000"
   );
+  useEffect(() => {
+    if (
+      supportedTokens.length > 0 &&
+      selectedTokenAddr === "0x0000000000000000000000000000000000000000"
+    ) {
+      const firstToken = supportedTokens[0];
+      if (firstToken) {
+        setSelectedTokenAddr(firstToken.address);
+      }
+    }
+  }, [supportedTokens, selectedTokenAddr]);
 
   const currentTokenConfig = useMemo(
     () =>
-      SUPPORTED_TOKENS.find((t) => t.address === selectedTokenAddr) ||
-      SUPPORTED_TOKENS[0],
-    [selectedTokenAddr]
+      supportedTokens.find((t) => t.address === selectedTokenAddr) ||
+      supportedTokens[0] || {
+        name: "Token",
+        symbol: "TOKEN",
+        address: selectedTokenAddr,
+      },
+    [selectedTokenAddr, supportedTokens]
   );
 
   const { data: nativeBalance, isLoading: isNativeLoading } = useBalance({
@@ -109,7 +143,7 @@ export const DashboardPage = () => {
   const displayUserLiquidity = formatValue(userLiquidityRaw, 18);
   const displayTotalLiquidity = formatValue(totalLiquidityRaw, 18);
 
-  const activeSymbol = tokenSymbol ?? currentTokenConfig.symbol;
+  const activeSymbol = tokenSymbol ?? currentTokenConfig?.symbol ?? "Token";
 
   return (
     <div className="space-y-8 animate-slide-up pb-12">
@@ -134,17 +168,24 @@ export const DashboardPage = () => {
               onChange={(e) =>
                 setSelectedTokenAddr(e.target.value as `0x${string}`)
               }
-              className="w-full appearance-none bg-surface/80 backdrop-blur border border-white/10 text-white font-mono text-sm py-3 pl-4 pr-10 rounded-xl focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all cursor-pointer hover:bg-white/5 hover:border-white/20 shadow-lg"
+              disabled={isLoadingTokens || supportedTokens.length === 0}
+              className="w-full appearance-none bg-surface/80 backdrop-blur border border-white/10 text-white font-mono text-sm py-3 pl-4 pr-10 rounded-xl focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all cursor-pointer hover:bg-white/5 hover:border-white/20 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {SUPPORTED_TOKENS.map((token) => (
-                <option
-                  key={token.address}
-                  value={token.address}
-                  className="bg-surface text-white py-2"
-                >
-                  {token.name} ({token.symbol})
-                </option>
-              ))}
+              {isLoadingTokens ? (
+                <option>Loading tokens...</option>
+              ) : supportedTokens.length === 0 ? (
+                <option>No tokens available</option>
+              ) : (
+                supportedTokens.map((token) => (
+                  <option
+                    key={token.address}
+                    value={token.address}
+                    className="bg-surface text-white py-2"
+                  >
+                    {token.name} ({token.symbol})
+                  </option>
+                ))
+              )}
             </select>
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400 pointer-events-none group-hover:text-purple-300 transition-colors" />
           </div>
@@ -216,7 +257,14 @@ export const DashboardPage = () => {
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
               </div>
               <div className="font-mono text-[11px] text-purple-200/90 truncate bg-purple-900/20 p-2.5 border border-purple-500/20 rounded-lg group-hover:border-purple-500/40 transition-all select-all">
-                {EXCHANGE_CONTRACT_ADDRESS}
+                <a
+                  href={`https://sepolia.etherscan.io/address/${EXCHANGE_CONTRACT_ADDRESS}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block truncate text-purple-200/90 hover:underline"
+                >
+                  {EXCHANGE_CONTRACT_ADDRESS}
+                </a>
               </div>
             </div>
             <div className="group">
@@ -227,7 +275,14 @@ export const DashboardPage = () => {
                 <div className="w-1.5 h-1.5 rounded-full bg-crimson-neon shadow-[0_0_8px_rgba(255,0,60,0.5)]" />
               </div>
               <div className="font-mono text-[11px] text-crimson-200/90 truncate bg-crimson-blood/20 p-2.5 border border-crimson-neon/20 rounded-lg group-hover:border-crimson-neon/40 transition-all select-all">
-                {selectedTokenAddr}
+                <a
+                  href={`https://sepolia.etherscan.io/address/${selectedTokenAddr}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block truncate text-crimson-200/90 hover:underline"
+                >
+                  {selectedTokenAddr}
+                </a>
               </div>
             </div>
           </div>

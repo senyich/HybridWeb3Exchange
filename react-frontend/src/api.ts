@@ -2,23 +2,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
+const BASE_URI = import.meta.env.VITE_API_BASE_URI || "http://localhost:5000";
 
+export async function getSymbolsAsync(){
+  try{
+    const resp = await axios.get(
+      `${BASE_URI}/api/tokens/get`
+    )
+    return resp.data.map((token: { name: any; symbol: any; address: any; }) => ({
+      name: token.name,
+      symbol: token.symbol,
+      address: token.address
+    }));
+  }
+  catch (err) {
+    console.error("getEthPrice error:", err);
+    return null;
+  }
+}
 
-//TODO сделать получения курса с другого api
-export async function getEthPrice(vsCurrency = "usd"): Promise<number | null> {
+export async function getEthPrice(): Promise<number | null> {
   try {
     const resp = await axios.get(
-      "https://api.coingecko.com/api/v3/simple/price",
-      {
-        params: {
-          ids: "ethereum",
-          vs_currencies: vsCurrency,
-        },
-        timeout: 10_000,
-      }
+      `${BASE_URI}/api/market/eth/getLatestUsdPrice`
     );
-
-    const price = resp?.data?.ethereum?.[vsCurrency];
+    const price = resp.data.price;
     if (typeof price === "number") return price;
     return null;
   } catch (err) {

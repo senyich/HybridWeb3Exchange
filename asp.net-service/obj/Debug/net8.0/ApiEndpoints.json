@@ -1,1 +1,70 @@
-[]
+[
+  {
+    "ContainingType": "asp.net_service.Controllers.MarketDataController",
+    "Method": "GetAvgEthTickersPrice",
+    "RelativePath": "api/market/eth/getAvgPriceChange",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "time",
+        "Type": "System.TimeSpan",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "asp.net_service.Controllers.MarketDataController",
+    "Method": "GetLastEthPrice",
+    "RelativePath": "api/market/eth/getLatestUsdPrice",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "asp.net_service.Controllers.TokensController",
+    "Method": "Add",
+    "RelativePath": "api/tokens/add",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "asp.net_service.Controllers.TokensController\u002BAddTokenRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "asp.net_service.Controllers.TokensController",
+    "Method": "GetAll",
+    "RelativePath": "api/tokens/get",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "asp.net_service.Controllers.TokensController",
+    "Method": "GetBySymbol",
+    "RelativePath": "api/tokens/get/{symbol}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "symbol",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

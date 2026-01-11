@@ -9,11 +9,16 @@ import {
   useBlockNumber,
 } from "wagmi";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
-import { ArrowDownUp, Zap, AlertCircle, Loader2, Wallet } from "lucide-react";
 import {
-  EXCHANGE_CONTRACT_ADDRESS,
-  SUPPORTED_TOKENS,
-} from "../config/constants";
+  ArrowDownUp,
+  Zap,
+  AlertCircle,
+  Loader2,
+  Wallet,
+  Settings2,
+} from "lucide-react";
+import { EXCHANGE_CONTRACT_ADDRESS } from "../config/constants";
+import { getSymbolsAsync } from "../api";
 import { EXCHANGE_BASE_ABI, ERC20_MIN_ABI } from "../config/contractsAbis";
 import { Card } from "./Card";
 import { ConnectKitButton } from "connectkit";
@@ -21,22 +26,28 @@ import { Skeleton } from "./Skeleton";
 
 type SwapMode = "ethToToken" | "tokenToEth";
 
+interface Token {
+  name: string;
+  symbol: string;
+  address: `0x${string}`;
+}
+
 function getAmountOut(
   amountIn: bigint,
   reserveIn: bigint,
   reserveOut: bigint
 ): bigint {
   if (amountIn <= 0n || reserveIn <= 0n || reserveOut <= 0n) return 0n;
-  const amountInWithFee = amountIn * 997n; // 0.3% fee
+  const amountInWithFee = amountIn * 997n;
   const numerator = amountInWithFee * reserveOut;
   const denominator = reserveIn * 1000n + amountInWithFee;
   return numerator / denominator;
 }
 
-// Helper for nice formatting (e.g. 0.1000 -> 0.1)
 const formatDisplay = (val: string) => {
   const num = parseFloat(val);
   if (isNaN(num)) return "0.00";
+  if (num > 0 && num < 0.000001) return "< 0.000001";
   return num.toLocaleString("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 6,
@@ -46,20 +57,54 @@ const formatDisplay = (val: string) => {
 export function TokenSwap() {
   const { address, isConnected } = useAccount();
   const { data: blockNumber } = useBlockNumber({ watch: true });
+  const [supportedTokens, setSupportedTokens] = useState<Token[]>([]);
+  const [isLoadingTokens, setIsLoadingTokens] = useState(true);
+
+  useEffect(() => {
+    const fetchTokens = async () => {
+      try {
+        const tokens = await getSymbolsAsync();
+        if (tokens && Array.isArray(tokens)) {
+          setSupportedTokens(tokens as Token[]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tokens:", error);
+      } finally {
+        setIsLoadingTokens(false);
+      }
+    };
+
+    fetchTokens();
+  }, []);
 
   const [swapMode, setSwapMode] = useState<SwapMode>("ethToToken");
   const [inputAmount, setInputAmount] = useState<string>("");
-  const [selectedTokenAddress, setSelectedTokenAddress] = useState<
-    `0x${string}`
-  >(SUPPORTED_TOKENS[0].address);
+  const [selectedTokenAddress, setSelectedTokenAddress] =
+    useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
   const [slippageTolerance, setSlippageTolerance] = useState<string>("0.5");
   const [txHash, setTxHash] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (
+      supportedTokens.length > 0 &&
+      selectedTokenAddress === "0x0000000000000000000000000000000000000000"
+    ) {
+      const firstToken = supportedTokens[0];
+      if (firstToken) {
+        setSelectedTokenAddress(firstToken.address);
+      }
+    }
+  }, [supportedTokens, selectedTokenAddress]);
+
   const tokenConfig = useMemo(
     () =>
-      SUPPORTED_TOKENS.find((t) => t.address === selectedTokenAddress) ||
-      SUPPORTED_TOKENS[0],
-    [selectedTokenAddress]
+      supportedTokens.find((t) => t.address === selectedTokenAddress) ||
+      supportedTokens[0] || {
+        name: "Token",
+        symbol: "TOKEN",
+        address: selectedTokenAddress,
+      },
+    [selectedTokenAddress, supportedTokens]
   );
 
   const {
@@ -204,7 +249,7 @@ export function TokenSwap() {
   const isInsufficientBalance =
     swapMode === "ethToToken"
       ? (ethBalance?.value || 0n) < parsedInputAmount
-      : (tokenBalance as bigint || 0n) < parsedInputAmount;
+      : ((tokenBalance as bigint) || 0n) < parsedInputAmount;
 
   const currentAllowanceBN = allowance ? (allowance as bigint) : 0n;
 
@@ -262,10 +307,27 @@ export function TokenSwap() {
     }
   };
 
+  const handleMaxInput = () => {
+    if (swapMode === "ethToToken" && ethBalance) {
+      const value = ethBalance.value - parseEther("0.005");
+      if (value > 0n) {
+        setInputAmount(formatEther(value));
+      } else {
+        setInputAmount(formatEther(ethBalance.value));
+      }
+    } else if (swapMode === "tokenToEth" && tokenBalance) {
+      setInputAmount(formatUnits(tokenBalance as bigint, decimals));
+    }
+  };
+
+  const handleSwitchMode = () => {
+    setSwapMode(swapMode === "ethToToken" ? "tokenToEth" : "ethToToken");
+  };
+
   const renderActionButton = () => {
     if (!isConnected) {
       return (
-        <div className="w-full [&>button]:w-full [&>button]:py-4 [&>button]:text-lg [&>button]:font-bold [&>button]:bg-purple-600 hover:[&>button]:bg-purple-700">
+        <div className="w-full [&>button]:w-full [&>button]:py-4 [&>button]:text-lg [&>button]:font-bold [&>button]:bg-purple-600 hover:[&>button]:bg-purple-700 [&>button]:rounded-xl">
           <ConnectKitButton />
         </div>
       );
@@ -275,9 +337,10 @@ export function TokenSwap() {
       return (
         <button
           disabled
-          className="w-full bg-slate-800/50 border border-slate-700 text-slate-400 font-bold py-4 rounded-xl cursor-not-allowed transition-all"
+          className="w-full bg-slate-800 border border-slate-700 text-slate-400 font-bold py-4 rounded-xl cursor-not-allowed transition-all"
         >
-          Insufficient Balance
+          Insufficient {swapMode === "ethToToken" ? "ETH" : tokenConfig?.symbol}{" "}
+          Balance
         </button>
       );
     }
@@ -286,7 +349,7 @@ export function TokenSwap() {
       return (
         <button
           disabled
-          className="w-full bg-slate-800/50 border border-slate-700 text-slate-400 font-bold py-4 rounded-xl cursor-not-allowed transition-all"
+          className="w-full bg-slate-800 border border-slate-700 text-slate-400 font-bold py-4 rounded-xl cursor-not-allowed transition-all"
         >
           Insufficient Liquidity
         </button>
@@ -309,10 +372,10 @@ export function TokenSwap() {
       return (
         <button
           onClick={handleApprove}
-          className="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-purple-900/20 hover:shadow-purple-900/40 flex justify-center items-center gap-2"
+          className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-purple-900/20 flex justify-center items-center gap-2"
         >
           <Zap className="w-5 h-5 fill-current" />
-          Approve {tokenConfig.symbol}
+          Approve {tokenConfig?.symbol}
         </button>
       );
     }
@@ -321,7 +384,7 @@ export function TokenSwap() {
       <button
         onClick={handleSwap}
         disabled={!isInputValid}
-        className="w-full bg-gradient-to-r from-purple-600 to-crimson-neon hover:from-purple-500 hover:to-crimson-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-purple-900/20 hover:shadow-purple-900/40 hover:scale-[1.01] active:scale-[0.99] flex justify-center items-center gap-2"
+        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-purple-900/40 hover:scale-[1.01] active:scale-[0.99] flex justify-center items-center gap-2"
       >
         <Zap className="w-5 h-5 fill-current" />
         Swap Now
@@ -329,154 +392,171 @@ export function TokenSwap() {
     );
   };
 
+  const TokenSelector = ({
+    isEth,
+    selected,
+    onSelect,
+  }: {
+    isEth: boolean;
+    selected: string;
+    onSelect: (val: string) => void;
+  }) => {
+    if (isEth) {
+      return (
+        <div className="flex items-center gap-2 bg-slate-800 pl-2 pr-4 py-1.5 rounded-full border border-white/10 shrink-0 h-10">
+          <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-[10px] font-bold text-white">
+            E
+          </div>
+          <span className="text-base font-bold text-slate-200">ETH</span>
+        </div>
+      );
+    }
+    return (
+      <select
+        value={selected}
+        onChange={(e) => onSelect(e.target.value)}
+        disabled={isLoadingTokens || supportedTokens.length === 0}
+        className="h-10 bg-slate-800 text-white text-base font-bold rounded-full px-4 pr-8 border border-slate-600 focus:border-purple-500 outline-none cursor-pointer hover:bg-slate-700 transition-colors shrink-0 appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "right 0.7rem center",
+          backgroundSize: "1em",
+        }}
+      >
+        {isLoadingTokens ? (
+          <option>Loading tokens...</option>
+        ) : supportedTokens.length === 0 ? (
+          <option>No tokens available</option>
+        ) : (
+          supportedTokens.map((token) => (
+            <option key={token.address} value={token.address}>
+              {token.symbol}
+            </option>
+          ))
+        )}
+      </select>
+    );
+  };
+
   return (
-    <Card className="w-full max-w-lg mx-auto relative !p-0 border-purple-500/10">
-      <div className="p-6 pb-4 flex items-center justify-between border-b border-white/5">
-        <h2 className="text-xl font-bold text-white tracking-tight">Exchange</h2>
+    <Card className="w-full max-w-[480px] mx-auto relative !p-0 border-purple-500/10 shadow-2xl overflow-hidden bg-[#0D0D12]">
+      <div className="px-6 py-5 flex items-center justify-between">
+        <h2 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-neon via-purple-electric to-crimson-neon drop-shadow-[0_0_10px_rgba(176,38,255,0.3)]">
+          Swap
+        </h2>
+
         <div className="flex gap-2">
-          <button
-            onClick={() => {
-              setSwapMode(
-                swapMode === "ethToToken" ? "tokenToEth" : "ethToToken"
-              );
-              setInputAmount("");
-            }}
-            className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-purple-300 transition-colors"
-          >
-            <ArrowDownUp className="w-4 h-4" />
+          <button className="group p-2 rounded-xl bg-white/5 hover:bg-purple-neon/20 border border-transparent hover:border-purple-neon/50 transition-all duration-300">
+            <Settings2 className="w-10 h-8 text-purple-300 group-hover:text-white group-hover:rotate-90 transition-transform duration-500" />
           </button>
         </div>
       </div>
 
-      <div className="p-6 space-y-2">
-        <div className="bg-background/50 border border-white/5 rounded-2xl p-4 focus-within:border-purple-500/50 focus-within:ring-1 focus-within:ring-purple-500/50 transition-all hover:border-white/10">
-          <div className="flex justify-between mb-3">
-            <label className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-              You Pay
-            </label>
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
-              <Wallet className="w-3 h-3" />
+      <div className="px-4 pb-4 space-y-1">
+        <div className="bg-[#1B1B22] border border-transparent hover:border-white/5 rounded-2xl p-4 transition-all">
+          <div className="flex justify-between mb-2">
+            <span className="text-sm text-slate-400 font-medium">You Pay</span>
+            <div className="flex items-center gap-2 text-sm text-slate-400">
+              <Wallet className="w-3.5 h-3.5" />
               {isBalanceLoading ? (
                 <Skeleton className="w-16 h-3" />
               ) : (
-                <span
-                  className="font-mono cursor-pointer hover:text-purple-300 transition-colors"
-                  onClick={() => setInputAmount(displayBalance)}
-                >
+                <span className="font-mono">
                   {formatDisplay(displayBalance)}
                 </span>
               )}
+              {isConnected && (
+                <button
+                  onClick={handleMaxInput}
+                  className="text-xs font-bold text-purple-400 hover:text-purple-300 uppercase px-1.5 py-0.5 bg-purple-500/10 rounded transition-colors"
+                >
+                  Max
+                </button>
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-4">
+
+          <div className="flex items-center gap-3">
             <input
               type="number"
               value={inputAmount}
               onChange={(e) => setInputAmount(e.target.value)}
-              placeholder="0.0"
-              className="flex-1 bg-transparent text-4xl font-mono text-white outline-none placeholder-slate-700"
+              placeholder="0"
+              className="w-full bg-transparent text-4xl font-medium text-white outline-none placeholder-slate-600"
               disabled={!isConnected || isTxConfirming}
             />
-            {swapMode === "ethToToken" ? (
-              <div className="flex items-center gap-2 bg-slate-800/80 pl-2 pr-4 py-1.5 rounded-full border border-white/10">
-                <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-[10px] font-bold">
-                  E
-                </div>
-                <span className="text-base font-bold text-slate-200">ETH</span>
-              </div>
-            ) : (
-              <select
-                value={selectedTokenAddress}
-                onChange={(e) =>
-                  setSelectedTokenAddress(e.target.value as `0x${string}`)
-                }
-                className="bg-slate-800 text-white text-base font-bold rounded-full px-4 py-2 border border-slate-600 focus:border-purple-500 outline-none cursor-pointer hover:bg-slate-700 transition-colors"
-              >
-                {SUPPORTED_TOKENS.map((token) => (
-                  <option key={token.address} value={token.address}>
-                    {token.symbol}
-                  </option>
-                ))}
-              </select>
-            )}
+            <TokenSelector
+              isEth={swapMode === "ethToToken"}
+              selected={selectedTokenAddress}
+              onSelect={(val) => setSelectedTokenAddress(val as `0x${string}`)}
+            />
           </div>
         </div>
 
-        <div className="flex justify-center -my-3 relative z-10">
-          <div className="p-1.5 rounded-xl bg-surface border border-white/10 shadow-lg">
-            <ArrowDownUp className="w-4 h-4 text-purple-400" />
+        <div className="relative h-2 z-10">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-4">
+            <button
+              onClick={handleSwitchMode}
+              className="p-2 rounded-xl bg-[#25252e] border-[3px] border-[#0D0D12] text-purple-400 hover:text-white hover:scale-110 hover:bg-purple-600 transition-all shadow-md"
+            >
+              <ArrowDownUp className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        <div className="bg-background/50 border border-white/5 rounded-2xl p-4 hover:border-white/10 transition-colors">
-          <div className="flex justify-between mb-3">
-            <label className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+        <div className="bg-[#1B1B22] border border-transparent hover:border-white/5 rounded-2xl p-4 transition-all">
+          <div className="flex justify-between mb-2">
+            <span className="text-sm text-slate-400 font-medium">
               You Receive
-            </label>
+            </span>
             <span className="text-xs text-slate-500 font-mono">(Estimate)</span>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <span
-              className={`text-4xl font-mono truncate ${
+
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              readOnly
+              value={inputAmount ? formatDisplay(displayOutput) : "0"}
+              className={`w-full bg-transparent text-4xl font-medium outline-none cursor-default ${
                 !inputAmount || parseFloat(displayOutput) === 0
-                  ? "text-slate-700"
+                  ? "text-slate-600"
                   : "text-purple-300"
               }`}
-            >
-              {inputAmount ? formatDisplay(displayOutput) : "0.0"}
-            </span>
-
-            {swapMode === "ethToToken" ? (
-              <select
-                value={selectedTokenAddress}
-                onChange={(e) =>
-                  setSelectedTokenAddress(e.target.value as `0x${string}`)
-                }
-                className="bg-slate-800 text-white text-base font-bold rounded-full px-4 py-2 border border-slate-600 focus:border-purple-500 outline-none cursor-pointer hover:bg-slate-700 transition-colors"
-              >
-                {SUPPORTED_TOKENS.map((token) => (
-                  <option key={token.address} value={token.address}>
-                    {token.symbol}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div className="flex items-center gap-2 bg-slate-800/80 pl-2 pr-4 py-1.5 rounded-full border border-white/10">
-                <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-[10px] font-bold">
-                  E
-                </div>
-                <span className="text-base font-bold text-slate-200">ETH</span>
-              </div>
-            )}
+            />
+            <TokenSelector
+              isEth={swapMode === "tokenToEth"}
+              selected={selectedTokenAddress}
+              onSelect={(val) => setSelectedTokenAddress(val as `0x${string}`)}
+            />
           </div>
         </div>
       </div>
 
       <div className="px-6 pb-6">
-        <div className="mb-6 grid grid-cols-2 gap-3 text-xs">
-          <div className="bg-slate-900/40 rounded-lg p-3 border border-white/5 flex flex-col justify-between">
-            <div className="text-slate-500 mb-1 font-medium">Slippage</div>
-            <div className="flex items-center gap-1 group">
-              <input
-                type="number"
-                value={slippageTolerance}
-                onChange={(e) => setSlippageTolerance(e.target.value)}
-                className="w-full bg-transparent text-white outline-none font-mono text-sm border-b border-transparent group-hover:border-slate-700 focus:!border-purple-500 transition-colors"
-                step="0.1"
-                min="0.1"
-                max="10"
-              />
-              <span className="text-slate-400">%</span>
+        {inputAmount && (
+          <div className="mb-4 px-1 py-2 space-y-2">
+            <div className="flex justify-between text-xs text-slate-400">
+              <span>Slippage Tolerance</span>
+              <div className="flex items-center gap-1">
+                <input
+                  className="bg-transparent text-right w-8 text-slate-200 focus:text-purple-300 outline-none border-b border-white/10 focus:border-purple-500"
+                  value={slippageTolerance}
+                  onChange={(e) => setSlippageTolerance(e.target.value)}
+                />
+                <span>%</span>
+              </div>
+            </div>
+            <div className="flex justify-between text-xs text-slate-400">
+              <span>Network Fee</span>
+              <span className="text-slate-200">~0.3%</span>
             </div>
           </div>
-          <div className="bg-slate-900/40 rounded-lg p-3 border border-white/5 flex flex-col justify-between">
-            <div className="text-slate-500 mb-1 font-medium">Network Fee</div>
-            <div className="text-white font-mono text-sm">~0.3%</div>
-          </div>
-        </div>
+        )}
 
         {txHash && (
-          <div className="mb-4 p-4 bg-purple-900/10 border border-purple-500/20 rounded-xl flex items-start gap-3 animate-fade-in">
+          <div className="mb-4 p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-start gap-3">
             <div className="mt-0.5">
               {isTxConfirming ? (
                 <Loader2 className="w-4 h-4 animate-spin text-purple-400" />
@@ -484,19 +564,19 @@ export function TokenSwap() {
                 <Zap className="w-4 h-4 text-green-400" />
               )}
             </div>
-            <div className="flex flex-col gap-1 w-full min-w-0">
-              <div className="text-sm font-semibold text-white">
+            <div className="flex flex-col w-full min-w-0">
+              <span className="text-sm font-semibold text-white">
                 {isTxConfirming
-                  ? "Confirming Transaction..."
+                  ? "Confirming..."
                   : isTxSuccess
                   ? "Swap Completed!"
-                  : "Transaction Submitted"}
-              </div>
+                  : "Submitted"}
+              </span>
               <a
                 href={`https://sepolia.etherscan.io/tx/${txHash}`}
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs text-purple-300/70 hover:text-purple-300 underline truncate transition-colors"
+                className="text-xs text-purple-300/70 hover:text-purple-300 underline"
               >
                 View on Explorer
               </a>
@@ -505,9 +585,9 @@ export function TokenSwap() {
         )}
 
         {swapError && (
-          <div className="mb-4 p-4 bg-red-900/10 border border-red-500/20 rounded-xl flex items-center gap-3 animate-fade-in">
+          <div className="mb-4 p-3 bg-red-900/20 border border-red-500/20 rounded-xl flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
-            <span className="text-sm text-red-200 font-medium">
+            <span className="text-xs text-red-200 font-medium break-words w-full">
               {(swapError as any).shortMessage ||
                 swapError.message ||
                 "Transaction failed"}

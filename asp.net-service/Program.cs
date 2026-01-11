@@ -1,5 +1,7 @@
 using asp.net_service.Persistance;
-using asp.net_service.Services.Implementation;
+using asp.net_service.Persistance.IRepositories;
+using asp.net_service.Persistance.Repositories;
+using asp.net_service.Services.Background;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +19,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
-builder.Services.AddHostedService<BlockchainWorker>();
+builder.Services.AddScoped<IEthTickerRepository, EthTickerRepository>();
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+
+builder.Services.AddHostedService<MarketHelperWorker>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -29,7 +34,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+}   
 app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
