@@ -1,0 +1,62 @@
+﻿using asp.net_service.Persistance;
+using asp.net_service.Persistance.IRepositories;
+using asp.net_service.Persistance.Repositories;
+using asp.net_service.Services.Background;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin() 
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+builder.Services.AddScoped<IEthTickerRepository, EthTickerRepository>();
+// register token repository and seed tokens
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+
+builder.Services.AddHostedService<MarketHeleperWorker>();
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+// seed default tokens into DB
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+
+    var tokenRepo = scope.ServiceProvider.GetRequiredService<ITokenRepository>();
+    var existing = await tokenRepo.GetAllAsync();
+    if (!existing.Any())
+    {
+        await tokenRepo.AddAsync(new asp.net_service.Entities.Token { Name = "TopCOIN", Symbol = "TC", Address = "0x8EdDd55579F72E99fCbe2fc9747edd46B1f032AC" });
+        await tokenRepo.AddAsync(new asp.net_service.Entities.Token { Name = "TopGEM", Symbol = "TG", Address = "0x9c5956607797FdC78216FfDc4d608953eED655ad" });
+        await tokenRepo.AddAsync(new asp.net_service.Entities.Token { Name = "MonkeyCoin", Symbol = "MC", Address = "0x3b2a9049685AACb584789C630d8c3d1d15D77AbD" });
+    }
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}   
+app.UseCors("AllowAll");
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();

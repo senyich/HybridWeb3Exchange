@@ -1,0 +1,72 @@
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Validations;
+using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.Contracts;
+using Nethereum.Hex.HexTypes;
+using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Web3;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Numerics;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace asp.net_service.Services.Implementation;
+
+public record EthUsdtPriceResponse
+{
+    public string symbol { get; set; }
+    public string price { get; set; }
+}
+
+public class BlockchainWorker : BackgroundService
+{
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger<BlockchainWorker> _logger;
+    private readonly string _rpcUrl;
+    private readonly string _contractAddress;
+    private readonly HttpClient _httpClient;
+ 
+    public BlockchainWorker(
+        IServiceScopeFactory scopeFactory,
+        IConfiguration configuration,
+        ILogger<BlockchainWorker> logger)
+    {
+        _scopeFactory = scopeFactory;
+        _logger = logger;
+        _rpcUrl = configuration.GetValue<string>("Blockchain:RpcUrl")!;
+        _contractAddress = configuration.GetValue<string>("Blockchain:ContractAddress")!;
+        _httpClient = new HttpClient();
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        var ethTickerRepository = _scopeFactory.
+        try
+        {
+            var price = await FetchEthUsdtPrice();
+            Console.WriteLine(price);
+
+        }
+        catch(Exception ex) { _logger.LogError($"Error fetching ETH/USDT price: {ex.Message}"); }
+    }
+    private async Task<decimal> FetchEthUsdtPrice()
+    {
+        var responseMessage = await _httpClient.GetAsync("https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT");
+        responseMessage.EnsureSuccessStatusCode();
+
+        var response = await responseMessage.Content.ReadFromJsonAsync<EthUsdtPriceResponse>()
+            ?? throw new JsonException("Cannot read response");
+
+        if (!decimal.TryParse(response.price, NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture, out var price))
+            throw new FormatException($"Invalid price format: '{response.price}'");
+
+        return price;
+    }
+
+}
