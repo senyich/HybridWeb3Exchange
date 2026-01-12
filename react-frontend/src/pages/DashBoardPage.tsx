@@ -122,8 +122,7 @@ export const DashboardPage = () => {
     args: [selectedTokenAddr],
   });
 
-  const { data: userLiquidityRaw, isLoading: isLiquidityLoading } =
-    useReadContract({
+  const { data: userLiquidityRaw, isLoading: isLiquidityLoading } = useReadContract({
       address: EXCHANGE_CONTRACT_ADDRESS,
       abi: EXCHANGE_BASE_ABI,
       functionName: "liquidity",

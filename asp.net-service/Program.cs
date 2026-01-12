@@ -23,6 +23,7 @@ builder.Services.AddScoped<IEthTickerRepository, EthTickerRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 builder.Services.AddHostedService<MarketHelperWorker>();
+builder.Services.AddHostedService<BlockchainWorker>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

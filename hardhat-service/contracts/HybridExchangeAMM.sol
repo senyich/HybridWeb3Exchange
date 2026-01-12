@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title HybridExchangeAMM
- * @notice Мульти-токен AMM контракт для дипломного проекта.
  * @dev Поддерживает множество пар ETH <-> ERC20 в одном контракте.
  * Реализует паттерн Monolithic AMM.
  */
@@ -30,7 +29,6 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
     event Swap(address indexed trader, address indexed token, string side, uint256 inputAmount, uint256 outputAmount);
 
     constructor() Ownable(msg.sender) {}
-
 
     /**
      * @notice Создание пула или добавление ликвидности в существующий.
@@ -54,8 +52,7 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
 
         if (pool.totalLiquidity == 0) {
             token.safeTransferFrom(msg.sender, address(this), tokenAmount);
-            
-            liquidityMinted = msg.value; 
+            liquidityMinted = msg.value;
             pool.totalLiquidity = liquidityMinted;
             liquidity[tokenAddr][msg.sender] = liquidityMinted;
 
@@ -78,10 +75,6 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
             pool.tokenReserve += requiredToken;
 
             if (tokenAmount > requiredToken) {
-                // Если это не safeTransfer, то просто не забираем лишнее, 
-                // но так как мы использовали safeTransferFrom выше только на requiredToken, сдача остается у юзера сама собой.
-                // Этот блок нужен, только если бы мы забрали ВСЕ tokenAmount сразу.
-                // В текущей логике мы забираем ровно requiredToken.
             }
         }
 
@@ -121,7 +114,6 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
         Pool storage pool = pools[tokenAddr];
         require(pool.isCreated, "Pool does not exist");
         require(msg.value > 0, "Zero ETH sent");
-        
         uint256 ethReserve = pool.ethReserve;
         uint256 tokenReserve = pool.tokenReserve;
         require(ethReserve > 0 && tokenReserve > 0, "Insufficient liquidity");

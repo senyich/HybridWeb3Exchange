@@ -12,7 +12,6 @@ public class TokensController : ControllerBase
     private readonly ITokenRepository _tokenRepo;
     private readonly IConfiguration _configuration;
     private readonly ILogger<TokensController> _logger;
-
     public TokensController(ITokenRepository tokenRepo, IConfiguration configuration, ILogger<TokensController> logger)
     {
         _tokenRepo = tokenRepo;

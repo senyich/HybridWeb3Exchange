@@ -1,21 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Validations;
-using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.Contracts;
-using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
-using Nethereum.Web3;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Numerics;
+﻿using System.Globalization;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Net.Http.Json;
+
 using asp.net_service.Persistance.IRepositories;
 using asp.net_service.Entities;
 

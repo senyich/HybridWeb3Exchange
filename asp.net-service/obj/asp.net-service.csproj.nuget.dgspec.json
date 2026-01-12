@@ -67,6 +67,10 @@
               "target": "Package",
               "version": "[1.23.0, )"
             },
+            "Nethereum.JsonRpc.WebSocketClient": {
+              "target": "Package",
+              "version": "[5.8.0, )"
+            },
             "Nethereum.Web3": {
               "target": "Package",
               "version": "[5.0.0, )"
