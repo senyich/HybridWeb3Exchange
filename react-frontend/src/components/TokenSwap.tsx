@@ -79,8 +79,7 @@ export function TokenSwap() {
 
   const [swapMode, setSwapMode] = useState<SwapMode>("ethToToken");
   const [inputAmount, setInputAmount] = useState<string>("");
-  const [selectedTokenAddress, setSelectedTokenAddress] =
-    useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
+  const [selectedTokenAddress, setSelectedTokenAddress] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
   const [slippageTolerance, setSlippageTolerance] = useState<string>("0.5");
   const [txHash, setTxHash] = useState<string | null>(null);
 
@@ -351,7 +350,7 @@ export function TokenSwap() {
           disabled
           className="w-full bg-slate-800 border border-slate-700 text-slate-400 font-bold py-4 rounded-xl cursor-not-allowed transition-all"
         >
-          Insufficient Liquidity
+          Insufficient Liquidity 
         </button>
       );
     }
@@ -457,7 +456,7 @@ export function TokenSwap() {
       <div className="px-4 pb-4 space-y-1">
         <div className="bg-[#1B1B22] border border-transparent hover:border-white/5 rounded-2xl p-4 transition-all">
           <div className="flex justify-between mb-2">
-            <span className="text-sm text-slate-400 font-medium">You Pay</span>
+            <span className="text-sm text-slate-400 font-medium">You Send</span>
             <div className="flex items-center gap-2 text-sm text-slate-400">
               <Wallet className="w-3.5 h-3.5" />
               {isBalanceLoading ? (
@@ -578,7 +577,7 @@ export function TokenSwap() {
                 rel="noreferrer"
                 className="text-xs text-purple-300/70 hover:text-purple-300 underline"
               >
-                View on Explorer
+                View on Etherscan (sepolia)
               </a>
             </div>
           </div>
