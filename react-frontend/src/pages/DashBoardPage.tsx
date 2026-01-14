@@ -122,7 +122,8 @@ export const DashboardPage = () => {
     args: [selectedTokenAddr],
   });
 
-  const { data: userLiquidityRaw, isLoading: isLiquidityLoading } = useReadContract({
+  const { data: userLiquidityRaw, isLoading: isLiquidityLoading } =
+    useReadContract({
       address: EXCHANGE_CONTRACT_ADDRESS,
       abi: EXCHANGE_BASE_ABI,
       functionName: "liquidity",
@@ -153,13 +154,15 @@ export const DashboardPage = () => {
           </h1>
           <div className="flex items-center gap-2 text-xs font-mono text-purple-300/70 bg-purple-900/10 px-3 py-1 rounded-full border border-purple-500/10 w-fit">
             <Activity className="w-3 h-3 text-green-400 animate-pulse" />
-            <span>LIVE NETWORK DATA</span>
+            <span>
+              Actual sepolia <data value=""></data>
+            </span>
           </div>
         </div>
 
         <div className="relative group w-full md:w-64">
           <label className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2 block pl-1">
-            Active Market
+            Active tokens
           </label>
           <div className="relative">
             <select
@@ -311,7 +314,7 @@ export const DashboardPage = () => {
             />
             <div className="mt-2">
               <StatRow
-                label="Total Liquidity Tokens"
+                label="Total Liquidity In Tokens"
                 value={displayTotalLiquidity || "0"}
                 unit="LP"
                 highlight
@@ -328,7 +331,7 @@ export const DashboardPage = () => {
               <User className="w-5 h-5 text-crimson-neon" />
             </div>
             <h3 className="text-lg font-bold text-white uppercase tracking-wide">
-              Your Position
+              Your Information
             </h3>
           </div>
 
