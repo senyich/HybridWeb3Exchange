@@ -18,7 +18,7 @@ import {
   Settings2,
 } from "lucide-react";
 import { EXCHANGE_CONTRACT_ADDRESS } from "../config/constants";
-import { getSymbolsAsync } from "../api";
+import { getSymbolsAsync } from "../utils/api";
 import { EXCHANGE_BASE_ABI, ERC20_MIN_ABI } from "../config/contractsAbis";
 import { Card } from "./Card";
 import { ConnectKitButton } from "connectkit";
@@ -79,7 +79,8 @@ export function TokenSwap() {
 
   const [swapMode, setSwapMode] = useState<SwapMode>("ethToToken");
   const [inputAmount, setInputAmount] = useState<string>("");
-  const [selectedTokenAddress, setSelectedTokenAddress] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
+  const [selectedTokenAddress, setSelectedTokenAddress] =
+    useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
   const [slippageTolerance, setSlippageTolerance] = useState<string>("0.5");
   const [txHash, setTxHash] = useState<string | null>(null);
 
@@ -350,7 +351,7 @@ export function TokenSwap() {
           disabled
           className="w-full bg-slate-800 border border-slate-700 text-slate-400 font-bold py-4 rounded-xl cursor-not-allowed transition-all"
         >
-          Insufficient Liquidity 
+          Insufficient Liquidity
         </button>
       );
     }

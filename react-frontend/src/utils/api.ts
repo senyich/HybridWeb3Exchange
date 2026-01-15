@@ -1,21 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
+import type { Token } from "../config/types";
 
 const BASE_URI = import.meta.env.VITE_API_BASE_URI || "http://localhost:5000";
 
-export async function getSymbolsAsync(){
-  try{
-    const resp = await axios.get(
-      `${BASE_URI}/api/tokens/get`
-    )
-    return resp.data.map((token: { name: any; symbol: any; address: any; }) => ({
+export async function getSymbolsAsync() {
+  try {
+    const resp = await axios.get(`${BASE_URI}/api/tokens/get`);
+    return resp.data.map((token: Token) => ({
       name: token.name,
       symbol: token.symbol,
-      address: token.address
+      address: token.address,
     }));
-  }
-  catch (err) {
+  } catch (err) {
     console.error("getEthPrice error:", err);
     return null;
   }

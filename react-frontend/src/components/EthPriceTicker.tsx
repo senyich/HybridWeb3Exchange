@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getEthPrice } from "../api";
+import { getEthPrice } from "../utils/api";
 import { Skeleton } from "./Skeleton";
 
 type Prices = {

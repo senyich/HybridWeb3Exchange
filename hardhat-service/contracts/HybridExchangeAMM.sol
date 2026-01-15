@@ -58,7 +58,6 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
 
             pool.ethReserve = msg.value;
             pool.tokenReserve = tokenAmount;
-
         } else {
             uint256 ethReserve = pool.ethReserve;
             uint256 tokenReserve = pool.tokenReserve;
