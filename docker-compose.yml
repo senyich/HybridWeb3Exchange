@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   frontend:
@@ -11,7 +11,7 @@ services:
       - app-network
 
   backend:
-    build: ./asp-net-backend
+    build: ./asp.net-service
     ports:
       - "8080:8080"
     environment:
