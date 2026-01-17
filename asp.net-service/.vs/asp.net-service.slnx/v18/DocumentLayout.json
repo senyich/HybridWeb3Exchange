@@ -70,12 +70,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 5,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -86,8 +82,7 @@
               "RelativeToolTip": "Services\\Background\\BlockchainWorker.cs",
               "ViewState": "AgIAACQAAAAAAAAAAAAYwCYAAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-12T09:07:53.318Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-12T09:07:53.318Z"
             },
             {
               "$type": "Document",
@@ -135,8 +130,7 @@
               "RelativeToolTip": "Dockerfile",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-01-05T09:41:07.918Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-05T09:41:07.918Z"
             },
             {
               "$type": "Document",
@@ -258,6 +252,14 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
               "WhenOpened": "2026-01-05T10:03:55.869Z"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             }
           ]
         }
