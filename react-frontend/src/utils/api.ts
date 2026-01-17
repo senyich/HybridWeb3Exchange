@@ -4,7 +4,7 @@ import axios from "axios";
 import type { Token } from "../config/types";
 
 // const BASE_URI = import.meta.env.VITE_API_BASE_URI || "http://localhost:5000";
-const BASE_URI = ""
+const BASE_URI = "/api";
 
 export async function getSymbolsAsync() {
   try {
