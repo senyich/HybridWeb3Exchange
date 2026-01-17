@@ -45,10 +45,10 @@ public class TokensController : ControllerBase
         {
             return Unauthorized("OWNER-PRIVATE-KEY header is required");
         }
-        var configuredKey = _configuration.GetValue<string>("OwnerPrivateKey");
+        var configuredKey = _configuration.GetValue<string>("PrivateKey");
         if (string.IsNullOrEmpty(configuredKey))
         {
-            _logger.LogWarning("OwnerPrivateKey is not configured in appsettings.json");
+            _logger.LogWarning("PrivateKey is not configured in appsettings.json");
             return StatusCode(500, "Server not configured to accept token additions");
         }
         if (providedKey != configuredKey)
