@@ -23,7 +23,7 @@ export async function getSymbolsAsync() {
 export async function getEthPrice(): Promise<number | null> {
   try {
     const resp = await axios.get(
-      `${BASE_URI}/api/market/eth/getLatestUsdPrice`
+      `${BASE_URI}/api/market/eth/getLatestUsdPrice`,
     );
     const price = resp.data.price;
     if (typeof price === "number") return price;
