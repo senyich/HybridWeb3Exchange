@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("asp.net-service")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0bb996524cccca86a2dfbdbb3683f96abe2a34a0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+53b8eb3c547f291033b542168bc0e5598d9f9b54")]
 [assembly: System.Reflection.AssemblyProductAttribute("asp.net-service")]
 [assembly: System.Reflection.AssemblyTitleAttribute("asp.net-service")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

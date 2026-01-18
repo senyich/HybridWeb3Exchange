@@ -11,5 +11,28 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Token>().HasData(
+            new Token
+            {
+                Id = Guid.NewGuid(),
+                Name = "TopCOIN",
+                Symbol = "TC",
+                Address = "0x8EdDd55579F72E99fCbe2fc9747edd46B1f032AC"
+            },
+            new Token
+            {
+                Id = Guid.NewGuid(),
+                Name = "TopGEM",
+                Symbol = "TG",
+                Address = "0x9c5956607797FdC78216FfDc4d608953eED655ad"
+            },
+            new Token
+            {
+                Id = Guid.NewGuid(),
+                Name = "MonkeyCoin",
+                Symbol = "MC",
+                Address = "0x3b2a9049685AACb584789C630d8c3d1d15D77AbD"
+            }
+        );
     }
 }
