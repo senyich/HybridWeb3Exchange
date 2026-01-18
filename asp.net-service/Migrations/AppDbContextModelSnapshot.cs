@@ -64,21 +64,21 @@ namespace asp.net_service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a9b5f9d2-5184-4969-b1b9-f63b2ef7a84c"),
+                            Id = new Guid("f8574459-7035-4406-8d5e-a092a8e7eed2"),
                             Address = "0x8EdDd55579F72E99fCbe2fc9747edd46B1f032AC",
                             Name = "TopCOIN",
                             Symbol = "TC"
                         },
                         new
                         {
-                            Id = new Guid("ed65fb76-1846-4872-a609-e1111cc1b982"),
+                            Id = new Guid("d91dfbbe-74b9-49df-a3e6-e75521b4222d"),
                             Address = "0x9c5956607797FdC78216FfDc4d608953eED655ad",
                             Name = "TopGEM",
                             Symbol = "TG"
                         },
                         new
                         {
-                            Id = new Guid("ca61d565-e728-40c5-bc8e-f1bb33a50446"),
+                            Id = new Guid("710ebcf7-3d63-476d-b16c-56c80d6ede65"),
                             Address = "0x3b2a9049685AACb584789C630d8c3d1d15D77AbD",
                             Name = "MonkeyCoin",
                             Symbol = "MC"

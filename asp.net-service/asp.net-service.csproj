@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Folder Include="Dtos\" />
+    <Folder Include="Migrations\" />
     <Folder Include="Services\Abstraction\" />
     <Folder Include="Services\Implementation\" />
   </ItemGroup>
