@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Layers } from "lucide-react";
 import type { Token } from "../../config/types";
 
 interface TokenSelectorProps {
@@ -15,16 +15,17 @@ export const TokenSelector = ({
   onTokenChange,
 }: TokenSelectorProps) => {
   return (
-    <div className="relative group w-full md:w-64">
-      <label className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2 block pl-1">
-        Active tokens
+    <div className="relative group w-full md:w-72">
+      <label className="flex items-center gap-2 text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2 pl-1">
+        <Layers className="w-3 h-3" />
+        Select Asset
       </label>
       <div className="relative">
         <select
           value={selectedTokenAddr}
           onChange={(e) => onTokenChange(e.target.value as `0x${string}`)}
           disabled={isLoadingTokens || supportedTokens.length === 0}
-          className="w-full appearance-none bg-surface/80 backdrop-blur border border-white/10 text-white font-mono text-sm py-3 pl-4 pr-10 rounded-xl focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all cursor-pointer hover:bg-white/5 hover:border-white/20 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full appearance-none bg-surface/50 backdrop-blur-md border border-white/10 text-white font-mono text-sm py-3.5 pl-4 pr-12 rounded-xl focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all cursor-pointer hover:bg-white/5 hover:border-white/20 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed truncate"
         >
           {isLoadingTokens ? (
             <option>Loading tokens...</option>
@@ -42,7 +43,9 @@ export const TokenSelector = ({
             ))
           )}
         </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400 pointer-events-none group-hover:text-purple-300 transition-colors" />
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none p-1 bg-white/5 rounded">
+           <ChevronDown className="w-4 h-4 text-purple-400 group-hover:text-white transition-colors" />
+        </div>
       </div>
     </div>
   );
