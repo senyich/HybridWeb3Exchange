@@ -4,9 +4,11 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --legacy-peer-deps
+RUN npm ci --legacy-peer-deps --omit=dev
 
 COPY . .
+
+ENV NODE_OPTIONS="--max-old-space-size=512"
 
 RUN npm run build
 
