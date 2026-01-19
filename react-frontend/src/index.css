@@ -19,3 +19,15 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-purple-900/40 rounded-full hover:bg-purple-600/60 transition-colors;
 }
+
+#token-selector-portal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#token-selector-portal > * {
+  pointer-events: auto;
+}
