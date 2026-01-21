@@ -24,7 +24,6 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
     mapping(address => mapping(address => uint256)) public liquidity;
     address[] public allTokens;
 
-    // Минимальная ликвидность для защиты от Inflation Attack (как в Uniswap V2)
     uint256 public constant MINIMUM_LIQUIDITY = 10**3;
 
     event PoolCreated(address indexed token);
@@ -53,10 +52,9 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
     {
         require(tokenAddr != address(0), "Invalid token address");
         require(msg.value > 0, "Zero ETH");
-        
+
         Pool storage pool = pools[tokenAddr];
-        
-        // Кэшируем резервы в память для экономии газа
+
         uint256 _ethReserve = pool.ethReserve;
         uint256 _tokenReserve = pool.tokenReserve;
 
@@ -70,28 +68,22 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
         uint256 tokenAdded;
 
         if (pool.totalLiquidity == 0) {
-            // Инициализация пула
             tokenAdded = tokenAmountDesired;
-            // Перевод токенов (поддержка fee-on-transfer)
             uint256 balanceBefore = IERC20(tokenAddr).balanceOf(address(this));
             IERC20(tokenAddr).safeTransferFrom(msg.sender, address(this), tokenAdded);
             uint256 balanceAfter = IERC20(tokenAddr).balanceOf(address(this));
-            tokenAdded = balanceAfter - balanceBefore; // Реально полученное кол-во
+            tokenAdded = balanceAfter - balanceBefore; 
             
             require(tokenAdded > 0, "Zero tokens received");
 
-            // Защита от атаки первого депозита: сжигаем первые 1000 wei
             liquidityMinted = ethAdded - MINIMUM_LIQUIDITY;
-            pool.totalLiquidity = ethAdded; // Total Supply включает сожженные
-            // Начисляем Shares (LP) минус защита
-            liquidity[tokenAddr][address(0)] = MINIMUM_LIQUIDITY; // Burn permanently
+            pool.totalLiquidity = ethAdded; 
+            liquidity[tokenAddr][address(0)] = MINIMUM_LIQUIDITY;
             liquidity[tokenAddr][msg.sender] = liquidityMinted;
         } else {
-            // Расчет идеального количества токенов на основе текущего ETH
             uint256 tokenAmountOptimal = (ethAdded * _tokenReserve) / _ethReserve;
             require(tokenAmountDesired >= tokenAmountOptimal, "Insufficient token amount");
 
-            // Мы берем только оптимальное кол-во токенов
             tokenAdded = tokenAmountOptimal;
 
             uint256 balanceBefore = IERC20(tokenAddr).balanceOf(address(this));
@@ -99,14 +91,12 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
             uint256 balanceAfter = IERC20(tokenAddr).balanceOf(address(this));
             tokenAdded = balanceAfter - balanceBefore;
 
-            // Расчет LP токенов (пропорционально ETH вкладу, так как ETH без комиссий)
             liquidityMinted = (ethAdded * pool.totalLiquidity) / _ethReserve;
             
             liquidity[tokenAddr][msg.sender] += liquidityMinted;
             pool.totalLiquidity += liquidityMinted;
         }
 
-        // Обновляем резервы
         pool.ethReserve = _ethReserve + ethAdded;
         pool.tokenReserve = _tokenReserve + tokenAdded;
 
@@ -125,21 +115,17 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
 
         uint256 _totalLiquidity = pool.totalLiquidity; // Gas saving
         
-        // Расчет доли
         ethAmount = (liquidityAmount * pool.ethReserve) / _totalLiquidity;
         tokenAmount = (liquidityAmount * pool.tokenReserve) / _totalLiquidity;
 
         require(ethAmount > 0 && tokenAmount > 0, "Amounts too small");
 
-        // Обновление стейта
         liquidity[tokenAddr][msg.sender] -= liquidityAmount;
         pool.totalLiquidity -= liquidityAmount;
         
-        // Обновление резервов перед трансфером (Checks-Effects-Interactions)
         pool.ethReserve -= ethAmount;
         pool.tokenReserve -= tokenAmount;
 
-        // Трансферы
         (bool success, ) = msg.sender.call{value: ethAmount}("");
         require(success, "ETH transfer failed");
         
@@ -165,7 +151,6 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
         tokensOut = getAmountOut(msg.value, _ethReserve, _tokenReserve);
         require(tokensOut >= minTokensOut, "Slippage tolerance exceeded");
 
-        // Обновляем резервы
         pool.ethReserve = _ethReserve + msg.value;
         pool.tokenReserve = _tokenReserve - tokensOut;
 
@@ -184,7 +169,6 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
         require(pool.isCreated, "Pool not created");
         require(tokenIn > 0, "Zero tokens");
 
-        // Поддержка fee-on-transfer для входящих свопов
         uint256 balanceBefore = IERC20(tokenAddr).balanceOf(address(this));
         IERC20(tokenAddr).safeTransferFrom(msg.sender, address(this), tokenIn);
         uint256 balanceAfter = IERC20(tokenAddr).balanceOf(address(this));
@@ -214,12 +198,6 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
         require(pool.isCreated, "Pool not created");
         
         uint256 actualTokenBalance = IERC20(tokenAddr).balanceOf(address(this));
-        // Для ETH мы не можем легко узнать "реальный" баланс только этого пула, 
-        // так как ETH общий на контракте. В монолитном AMM sync обычно работает только для токенов,
-        // либо требует сложной логики учета. В данной версии обновляем только Token reserve.
-        
-        // ВНИМАНИЕ: В монолитной архитектуре sync для ETH невозможен без отслеживания общего баланса ETH контракта.
-        // Мы обновляем только токен.
         pool.tokenReserve = actualTokenBalance;
         
         emit Sync(tokenAddr, pool.ethReserve, actualTokenBalance);
