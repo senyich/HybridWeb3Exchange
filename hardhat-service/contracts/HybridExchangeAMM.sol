@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title HybridExchangeAMM v2
- * @notice Оптимизированный монолитный AMM с защитой от inflation attack и поддержкой fee-on-transfer токенов.
  */
 contract HybridExchangeAMM is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
@@ -72,8 +71,8 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
             uint256 balanceBefore = IERC20(tokenAddr).balanceOf(address(this));
             IERC20(tokenAddr).safeTransferFrom(msg.sender, address(this), tokenAdded);
             uint256 balanceAfter = IERC20(tokenAddr).balanceOf(address(this));
-            tokenAdded = balanceAfter - balanceBefore; 
-            
+            tokenAdded = balanceAfter - balanceBefore;
+
             require(tokenAdded > 0, "Zero tokens received");
 
             liquidityMinted = ethAdded - MINIMUM_LIQUIDITY;
@@ -92,7 +91,7 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
             tokenAdded = balanceAfter - balanceBefore;
 
             liquidityMinted = (ethAdded * pool.totalLiquidity) / _ethReserve;
-            
+
             liquidity[tokenAddr][msg.sender] += liquidityMinted;
             pool.totalLiquidity += liquidityMinted;
         }
@@ -103,18 +102,18 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
         emit LiquidityAdded(tokenAddr, msg.sender, ethAdded, tokenAdded, liquidityMinted);
     }
 
-    function removeLiquidity(address tokenAddr, uint256 liquidityAmount, uint256 deadline) 
-        external 
-        nonReentrant 
+    function removeLiquidity(address tokenAddr, uint256 liquidityAmount, uint256 deadline)
+        external
+        nonReentrant
         ensure(deadline)
-        returns (uint256 ethAmount, uint256 tokenAmount) 
+        returns (uint256 ethAmount, uint256 tokenAmount)
     {
         Pool storage pool = pools[tokenAddr];
         require(pool.totalLiquidity > 0, "Pool not exists");
         require(liquidity[tokenAddr][msg.sender] >= liquidityAmount, "Not enough shares");
 
-        uint256 _totalLiquidity = pool.totalLiquidity; // Gas saving
-        
+        uint256 _totalLiquidity = pool.totalLiquidity;
+
         ethAmount = (liquidityAmount * pool.ethReserve) / _totalLiquidity;
         tokenAmount = (liquidityAmount * pool.tokenReserve) / _totalLiquidity;
 
@@ -122,13 +121,13 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
 
         liquidity[tokenAddr][msg.sender] -= liquidityAmount;
         pool.totalLiquidity -= liquidityAmount;
-        
+
         pool.ethReserve -= ethAmount;
         pool.tokenReserve -= tokenAmount;
 
         (bool success, ) = msg.sender.call{value: ethAmount}("");
         require(success, "ETH transfer failed");
-        
+
         IERC20(tokenAddr).safeTransfer(msg.sender, tokenAmount);
 
         emit LiquidityRemoved(tokenAddr, msg.sender, ethAmount, tokenAmount, liquidityAmount);
@@ -147,7 +146,7 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
 
         uint256 _ethReserve = pool.ethReserve;
         uint256 _tokenReserve = pool.tokenReserve;
-        
+
         tokensOut = getAmountOut(msg.value, _ethReserve, _tokenReserve);
         require(tokensOut >= minTokensOut, "Slippage tolerance exceeded");
 
@@ -196,10 +195,8 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
     function sync(address tokenAddr) external nonReentrant {
         Pool storage pool = pools[tokenAddr];
         require(pool.isCreated, "Pool not created");
-        
         uint256 actualTokenBalance = IERC20(tokenAddr).balanceOf(address(this));
         pool.tokenReserve = actualTokenBalance;
-        
         emit Sync(tokenAddr, pool.ethReserve, actualTokenBalance);
     }
 
@@ -227,5 +224,26 @@ contract HybridExchangeAMM is ReentrancyGuard, Ownable {
      */
     function getTokensCount() external view returns (uint256) {
         return allTokens.length;
+    }
+
+    /**
+     * @notice Получить цену ETH в токенах (сколько токенов за 1 ETH)
+     * @dev Используйте этот метод для получения реального курса из пула
+     */
+    function getETHPriceInTokens(address tokenAddr) external view returns (uint256) {
+        Pool storage pool = pools[tokenAddr];
+        require(pool.isCreated, "Pool not created");
+        require(pool.ethReserve > 0, "No ETH reserve");
+        return (pool.tokenReserve * 1e18) / pool.ethReserve;
+    }
+
+    /**
+     * @notice Получить цену токена в ETH (сколько ETH за 1 токен)
+     */
+    function getTokenPriceInETH(address tokenAddr) external view returns (uint256) {
+        Pool storage pool = pools[tokenAddr];
+        require(pool.isCreated, "Pool not created");
+        require(pool.tokenReserve > 0, "No token reserve");
+        return (pool.ethReserve * 1e18) / pool.tokenReserve;
     }
 }

@@ -119,7 +119,7 @@ export const DashboardPage = () => {
         isLoadingTokens={isLoadingTokens}
         onTokenChange={setSelectedTokenAddr}
       />
-
+      
       {!isConnected ? (
         <div className="space-y-8">
           <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-surface to-background p-8 md:p-12 text-center">
