@@ -193,14 +193,23 @@ export function TokenSwap() {
     return (calculatedOutputAmount * BigInt(slipFactor)) / 10000n;
   }, [calculatedOutputAmount, slippageTolerance]);
 
-  const displayBalance =
+  const displayInputBalance = 
     swapMode === "ethToToken"
       ? ethBalance
         ? formatEther(ethBalance.value)
         : "0"
       : tokenBalance
-        ? formatUnits(tokenBalance as bigint, decimals)
-        : "0";
+      ? formatUnits(tokenBalance as bigint, decimals)
+      : "0";
+
+  const displayOutputBalance = 
+    swapMode === "tokenToEth" 
+      ? ethBalance
+        ? formatEther(ethBalance.value)
+        : "0"
+      : tokenBalance
+      ? formatUnits(tokenBalance as bigint, decimals)
+      : "0";
 
   const isBalanceLoading =
     swapMode === "ethToToken" ? isEthLoading : isTokenLoading;
@@ -314,7 +323,7 @@ export function TokenSwap() {
             label="You pay"
             amount={inputAmount}
             onAmountChange={setInputAmount}
-            displayBalance={displayBalance}
+            displayBalance={displayInputBalance}
             isBalanceLoading={isBalanceLoading}
             isConnected={isConnected}
             isTxConfirming={isTxConfirming}
@@ -350,7 +359,7 @@ export function TokenSwap() {
           <SwapInputPanel
             label="You receive"
             amount={inputAmount ? displayOutput : "0"}
-            displayBalance={displayBalance}
+            displayBalance={displayOutputBalance}
             isBalanceLoading={isBalanceLoading}
             isConnected={isConnected}
             isTxConfirming={isTxConfirming}
