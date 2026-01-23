@@ -25,6 +25,7 @@ public class MarketDataController : ControllerBase
         {
             return NotFound("No ticker data available.");
         }
+        await _ethTickerRepo.CleanupOldTickersAsync();
         return Ok(new { price = latestTicker.Price, timestamp = latestTicker.TimeStamp });
     }
     [HttpGet("eth/getAvgPriceChange")]

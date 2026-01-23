@@ -24,6 +24,7 @@ public class EthTickerRepository : IEthTickerRepository
         if (ticker.TimeStamp == default) ticker.TimeStamp = DateTime.UtcNow;
 
         await _context.EthTickers.AddAsync(ticker);
+        
         await _context.SaveChangesAsync();
         return ticker;
     }
@@ -54,5 +55,20 @@ public class EthTickerRepository : IEthTickerRepository
             .FirstOrDefaultAsync();
 
         return latest!;
+    }
+    public async Task CleanupOldTickersAsync()
+    {
+        var totalCount = await _context.EthTickers.CountAsync();
+
+        if (totalCount > 100)
+        {
+            var recordsToDelete = await _context.EthTickers
+                .OrderBy(t => t.TimeStamp) 
+                .Take(totalCount - 100)   
+                .ToListAsync();
+
+            _context.EthTickers.RemoveRange(recordsToDelete);
+            await _context.SaveChangesAsync();
+        }
     }
 }

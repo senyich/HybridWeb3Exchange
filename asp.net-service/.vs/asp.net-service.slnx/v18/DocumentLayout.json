@@ -3,6 +3,26 @@
   "WorkspaceRootPath": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\controllers\\marketdatacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:controllers\\marketdatacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\controllers\\tokenscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:controllers\\tokenscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\persistance\\irepositories\\iethtickerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:persistance\\irepositories\\iethtickerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\persistance\\repositories\\ethtickerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:persistance\\repositories\\ethtickerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\entities\\ethticker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:entities\\ethticker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
@@ -17,18 +37,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\entities\\token.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:entities\\token.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\entities\\ethticker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:entities\\ethticker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\controllers\\tokenscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:controllers\\tokenscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\controllers\\marketdatacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:controllers\\marketdatacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -47,14 +55,6 @@
       "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:persistance\\irepositories\\itokenrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\persistance\\repositories\\ethtickerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:persistance\\repositories\\ethtickerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\persistance\\irepositories\\iethtickerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:persistance\\irepositories\\iethtickerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|c:\\users\\administrator\\documents\\gitreposes\\hybridexchangeproject\\asp.net-service\\persistance\\repositories\\tokenrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9643321F-ADF9-F680-F1D1-04C7ABD959A1}|asp.net-service.csproj|solutionrelative:persistance\\repositories\\tokenrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -70,7 +70,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -78,7 +78,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -91,56 +91,72 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Dockerfile",
-              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Dockerfile",
-              "RelativeDocumentMoniker": "Dockerfile",
-              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Dockerfile",
-              "RelativeToolTip": "Dockerfile",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2026-01-05T09:41:07.918Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABoAAAA0AAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "EthTicker.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Entities\\EthTicker.cs",
+              "RelativeDocumentMoniker": "Entities\\EthTicker.cs",
+              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Entities\\EthTicker.cs",
+              "RelativeToolTip": "Entities\\EthTicker.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-04T06:47:00.389Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AppDbContext.cs",
-              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\AppDbContext.cs",
-              "RelativeDocumentMoniker": "Persistance\\AppDbContext.cs",
-              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\AppDbContext.cs",
-              "RelativeToolTip": "Persistance\\AppDbContext.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAA5wB8AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-04T07:12:47.312Z",
+              "WhenOpened": "2026-01-11T06:50:35.193Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
+              "Title": "MarketDataController.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Controllers\\MarketDataController.cs",
+              "RelativeDocumentMoniker": "Controllers\\MarketDataController.cs",
+              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Controllers\\MarketDataController.cs",
+              "RelativeToolTip": "Controllers\\MarketDataController.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAxwBgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-11T07:00:45.417Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "IEthTickerRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\IRepositories\\IEthTickerRepository.cs",
+              "RelativeDocumentMoniker": "Persistance\\IRepositories\\IEthTickerRepository.cs",
+              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\IRepositories\\IEthTickerRepository.cs",
+              "RelativeToolTip": "Persistance\\IRepositories\\IEthTickerRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-11T06:52:07.067Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "EthTickerRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\Repositories\\EthTickerRepository.cs",
+              "RelativeDocumentMoniker": "Persistance\\Repositories\\EthTickerRepository.cs",
+              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\Repositories\\EthTickerRepository.cs",
+              "RelativeToolTip": "Persistance\\Repositories\\EthTickerRepository.cs",
+              "ViewState": "AgIAADMAAAAAAAAAAAAIwDoAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-11T06:54:08.234Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "TokensController.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Controllers\\TokensController.cs",
               "RelativeDocumentMoniker": "Controllers\\TokensController.cs",
               "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Controllers\\TokensController.cs",
               "RelativeToolTip": "Controllers\\TokensController.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAA3wCkAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAxwCkAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-11T07:40:47.605Z"
+              "WhenOpened": "2026-01-11T07:40:47.605Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 8,
               "Title": "Token.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Entities\\Token.cs",
               "RelativeDocumentMoniker": "Entities\\Token.cs",
@@ -152,31 +168,43 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "EthTicker.cs",
-              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Entities\\EthTicker.cs",
-              "RelativeDocumentMoniker": "Entities\\EthTicker.cs",
-              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Entities\\EthTicker.cs",
-              "RelativeToolTip": "Entities\\EthTicker.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-11T06:50:35.193Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "MarketDataController.cs",
-              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Controllers\\MarketDataController.cs",
-              "RelativeDocumentMoniker": "Controllers\\MarketDataController.cs",
-              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Controllers\\MarketDataController.cs",
-              "RelativeToolTip": "Controllers\\MarketDataController.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAQwAgAAAAyAAAAAAAAAA==",
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Persistance\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\AppDbContext.cs",
+              "RelativeToolTip": "Persistance\\AppDbContext.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAA5wB8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-11T07:00:45.417Z"
+              "WhenOpened": "2026-01-04T07:12:47.312Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 7,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABoAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T06:47:00.389Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Dockerfile",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Dockerfile",
+              "RelativeDocumentMoniker": "Dockerfile",
+              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Dockerfile",
+              "RelativeToolTip": "Dockerfile",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-01-05T09:41:07.918Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "BlockchainWorker.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Services\\Background\\BlockchainWorker.cs",
               "RelativeDocumentMoniker": "Services\\Background\\BlockchainWorker.cs",
@@ -188,7 +216,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 12,
               "Title": "ITokenRepository.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\IRepositories\\ITokenRepository.cs",
               "RelativeDocumentMoniker": "Persistance\\IRepositories\\ITokenRepository.cs",
@@ -200,7 +228,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "MarketHelperWorker.cs",
               "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Services\\Background\\MarketHelperWorker.cs",
               "RelativeDocumentMoniker": "Services\\Background\\MarketHelperWorker.cs",
@@ -209,30 +237,6 @@
               "ViewState": "AgIAAEIAAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-04T12:48:39.83Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "EthTickerRepository.cs",
-              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\Repositories\\EthTickerRepository.cs",
-              "RelativeDocumentMoniker": "Persistance\\Repositories\\EthTickerRepository.cs",
-              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\Repositories\\EthTickerRepository.cs",
-              "RelativeToolTip": "Persistance\\Repositories\\EthTickerRepository.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAIBJwBkAAAAzAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-11T06:54:08.234Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "IEthTickerRepository.cs",
-              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\IRepositories\\IEthTickerRepository.cs",
-              "RelativeDocumentMoniker": "Persistance\\IRepositories\\IEthTickerRepository.cs",
-              "ToolTip": "C:\\Users\\Administrator\\Documents\\GitReposes\\HybridExchangeProject\\asp.net-service\\Persistance\\IRepositories\\IEthTickerRepository.cs",
-              "RelativeToolTip": "Persistance\\IRepositories\\IEthTickerRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-11T06:52:07.067Z"
             },
             {
               "$type": "Document",
