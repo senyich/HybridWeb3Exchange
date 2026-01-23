@@ -73,7 +73,7 @@ export function TokenSwap() {
         symbol: "TOKEN",
         address: selectedTokenAddress,
       },
-    [selectedTokenAddress, supportedTokens]
+    [selectedTokenAddress, supportedTokens],
   );
 
   const {
@@ -199,8 +199,8 @@ export function TokenSwap() {
         ? formatEther(ethBalance.value)
         : "0"
       : tokenBalance
-      ? formatUnits(tokenBalance as bigint, decimals)
-      : "0";
+        ? formatUnits(tokenBalance as bigint, decimals)
+        : "0";
 
   const isBalanceLoading =
     swapMode === "ethToToken" ? isEthLoading : isTokenLoading;
@@ -239,7 +239,7 @@ export function TokenSwap() {
       },
       {
         onError: (err) => console.error("Approve failed", err),
-      }
+      },
     );
   };
 
@@ -258,7 +258,7 @@ export function TokenSwap() {
         {
           onSuccess: (hash) => setTxHash(hash),
           onError: (err) => console.error("Swap ETH->Token failed", err),
-        }
+        },
       );
     } else {
       writeSwap(
@@ -271,7 +271,7 @@ export function TokenSwap() {
         {
           onSuccess: (hash) => setTxHash(hash),
           onError: (err) => console.error("Swap Token->ETH failed", err),
-        }
+        },
       );
     }
   };
@@ -367,7 +367,7 @@ export function TokenSwap() {
                 disabled={false}
               />
             }
-            swapMode={swapMode}
+            swapMode={swapMode === "ethToToken" ? "tokenToEth" : "ethToToken"}
             isOutput={true}
           />
         </div>
