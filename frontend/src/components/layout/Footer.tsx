@@ -38,8 +38,7 @@ export const Footer = () => {
         </div>
         
         <div className="mt-10 pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-600 font-mono uppercase tracking-wider">
-          <p>© 2024 Diplom Project. v.1.0.0-beta</p>
-          <p>System Status: Operational</p>
+          <p>© 2026 Diplom Project. v.1.0.0-alpha</p>
         </div>
       </div>
     </footer>
