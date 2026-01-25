@@ -43,9 +43,6 @@ const Header = () => {
                   <span className="text-lg sm:text-xl font-black tracking-tighter text-white uppercase leading-none">
                     Ru<span className="text-purple-neon">.</span>HEX
                   </span>
-                  <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase group-hover:text-crimson-neon transition-colors">
-                    Protocol
-                  </span>
                 </div>
               </Link>
 
@@ -84,7 +81,7 @@ const Header = () => {
                       group relative px-6 py-2.5 text-sm font-mono font-bold uppercase tracking-wide transition-all duration-300
                       border overflow-hidden clip-path-polygon
                       ${isConnected 
-                        ? 'border-purple-500/30 bg-purple-500/5 text-purple-300 hover:border-purple-400' 
+                        ? 'border-purple-500/30 bg-purple-500/5 text-purple-300 hover:border-purple-400'
                         : 'border-white/10 bg-white/5 text-gray-300 hover:border-crimson-neon/50 hover:text-white'}
                     `}
                   >

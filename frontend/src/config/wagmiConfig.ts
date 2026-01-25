@@ -1,26 +1,24 @@
+import { createConfig, http } from "wagmi";
+import { sepolia } from "wagmi/chains";
+import { getDefaultConfig } from "connectkit";
 import { QueryClient } from "@tanstack/react-query";
-import {
-  getDefaultConfig,
-} from "connectkit";
-import { http } from "viem";
-import { sepolia } from "viem/chains";
-import { createConfig } from "wagmi";
 
-const wagmiConfiguration = createConfig(
+export const queryClient = new QueryClient();
+
+export const wagmiConfig = createConfig(
   getDefaultConfig({
     chains: [sepolia],
     transports: {
       [sepolia.id]: http(),
     },
-    walletConnectProjectId: "b1859eb4d0c0d7433f3343f083cb56c9",
-    appName: "Diplom Exchange",
-    appDescription: "Hybrid Exchange Project",
-  })
+    walletConnectProjectId: "e18407bedde6e981cf3cd219230e13ea",
+    appName: "My DApp",
+    appDescription: "My DApp Description",
+    appIcon: "",
+  }),
 );
-
-const queryClient = new QueryClient();
-
-export {
-    wagmiConfiguration,
-    queryClient
-};
+declare module 'wagmi' {
+  interface Register {
+    config: typeof wagmiConfig;
+  }
+}

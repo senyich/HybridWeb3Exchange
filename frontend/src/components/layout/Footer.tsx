@@ -16,7 +16,7 @@ export const Footer = () => {
 
           <div className="flex items-center gap-8">
             <a 
-              href="https://github.com/senyich" 
+              href="https://github.com/senyich/HybridWeb3Exchange" 
               target="_blank" 
               rel="noreferrer" 
               className="group flex items-center gap-2 text-xs font-mono text-gray-500 hover:text-white transition-colors"
@@ -31,7 +31,7 @@ export const Footer = () => {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </div>
               <span className="text-[10px] font-mono text-green-400 uppercase tracking-wider">
-                Sepolia Active
+                Sepolia
               </span>
             </div>
           </div>
