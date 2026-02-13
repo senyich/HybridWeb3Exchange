@@ -3,11 +3,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo, useEffect } from "react";
 import { useAccount, useBalance, useReadContract } from "wagmi";
-import { ConnectKitButton } from "connectkit"; // Импортируем для кнопки подключения
+import { ConnectKitButton } from "connectkit"; 
 import { EXCHANGE_BASE_ABI, ERC20_MIN_ABI } from "../config/contractsAbis";
 import { EXCHANGE_CONTRACT_ADDRESS } from "../config/constants";
 import { getSymbolsAsync } from "../utils/api";
-import { Wallet, Coins, Lock, ArrowRight } from "lucide-react"; // Добавили иконки
+import { Wallet, Coins, Lock, ArrowRight } from "lucide-react"; 
 import { BalanceCard } from "../components/dashboard/BalanceCard";
 import { DashboardHeader } from "../components/dashboard/DashboardHeader";
 import { ContractAddressCard } from "../components/dashboard/ContractAddressCard";

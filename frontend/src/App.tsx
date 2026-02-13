@@ -7,6 +7,7 @@ import Header from "./components/layout/Header";
 import { DashboardPage } from "./pages/DashBoardPage";
 import { Footer } from "./components/layout/Footer";
 import SwapPage from "./pages/SwapPage";
+import { HomePage } from "./pages/HomePage";
 
 function App() {
   return (
@@ -56,8 +57,9 @@ function App() {
               <Header />
               <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
                 <Routes>
-                  <Route path="/" element={<DashboardPage />} />
-                  <Route path="/trade" element={<SwapPage />} />
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/swap" element={<SwapPage />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
                 </Routes>
               </main>
               <Footer />

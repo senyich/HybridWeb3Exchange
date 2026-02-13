@@ -1,7 +1,7 @@
 import { useAccount } from "wagmi";
 import { Zap } from "lucide-react";
 import { EthPriceTicker } from "../components/EthPriceTicker";
-import { TokenSwap } from "../components/TokenSwap";
+import { TokenSwap } from "../components/tokenSwap/TokenSwap";
 
 export default function SwapPage() {
   const { isConnected } = useAccount();

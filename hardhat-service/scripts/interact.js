@@ -18,36 +18,36 @@ async function main() {
   const ethAmountPerPool = hre.ethers.parseUnits("0.01", 18);
 
   const addLiquidityToPool = async (tokenContract, symbol, amountStr) => {
-    console.log(`\n🔹 Работаем с ${symbol}...`);
+    console.log(`${symbol}...`);
     const tokenAmount = hre.ethers.parseUnits(amountStr, 18);
     const tokenAddr = await tokenContract.getAddress();
 
     const allowance = await tokenContract.allowance(deployer.address, EXCHANGE_ADDR);
     if (allowance < tokenAmount) {
-      console.log(`  - Апрув ${symbol}...`);
+      console.log(`апрув ${symbol}...`);
       const txApprove = await tokenContract.approve(EXCHANGE_ADDR, tokenAmount);
       await txApprove.wait();
-      console.log(`  ✅ Апрув подтвержден`);
+      console.log(`апрув подтвержден`);
     } else {
-      console.log(`  - ${symbol} уже имеет апрув`);
+      console.log(`${symbol} уже имеет апрув`);
     }
 
-    console.log(`  - Добавление ликвидности в пул ${symbol}...`);
+    console.log(`добавление ликвидности в пул ${symbol}...`);
     const txAdd = await Exchange.addLiquidity(tokenAddr, tokenAmount, {
       value: ethAmountPerPool
     });
     await txAdd.wait();
-    console.log(`  ✅ Пул ${symbol} готов!`);
+    console.log(`пул ${symbol} готов!`);
   };
 
   try {
-    await addLiquidityToPool(TopCoin, "TC", "50000");   // Дешевый
-    await addLiquidityToPool(TopGem, "TG", "100");     // Дорогой
-    await addLiquidityToPool(MonkeyCoin, "MC", "5000"); // Средний
+    await addLiquidityToPool(TopCoin, "TC", "50000");   
+    await addLiquidityToPool(TopGem, "TG", "100");     
+    await addLiquidityToPool(MonkeyCoin, "MC", "5000"); 
 
-    console.log("\n🚀 ВСЕ ПУЛЫ УСПЕШНО НАПОЛНЕНЫ!");
+    console.log("\nВСЕ ПУЛЫ УСПЕШНО НАПОЛНЕНЫ");
   } catch (error) {
-    console.error("\n❌ Ошибка при взаимодействии:");
+    console.error("\nОшибка");
     console.error(error);
   }
 }
