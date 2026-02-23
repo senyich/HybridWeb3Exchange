@@ -8,7 +8,6 @@ import {
   BarChart3,
   Lock,
   ArrowRight,
-  Github
 } from "lucide-react";
 import { EXCHANGE_BASE_ABI } from "../config/contractsAbis";
 import { EXCHANGE_CONTRACT_ADDRESS } from "../config/constants";
@@ -70,8 +69,8 @@ export const HomePage = () => {
   const features = [
     {
       icon: <Zap className="w-6 h-6 text-purple-neon" />,
-      title: "Мгновенные свопы",
-      description: "Обменивайте токены за секунды благодаря гибридной архитектуре AMM + order book.",
+      title: "Быстрые свапы",
+      description: "Обменивайте токены за секунды благодаря гибридной архитектуре AMM + Contract Listeners",
     },
     {
       icon: <Shield className="w-6 h-6 text-crimson-neon" />,
@@ -116,7 +115,7 @@ export const HomePage = () => {
             <span className="text-purple-neon">HEX</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 font-light mb-8 max-w-2xl mx-auto">
-            Гибридная децентрализованная биржа на базе Ethereum. Обменивайте токены, предоставляйте ликвидность и зарабатывайте комиссии.
+            Гибридная децентрализованная биржа на базе Ethereum. Обменивайте токены, предоставляйте ликвидность и зарабатывайте{"(пока что тестовые токены, эх)"}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -127,7 +126,7 @@ export const HomePage = () => {
                   className="group relative px-8 py-4 bg-purple-neon text-black font-bold uppercase tracking-wider transition-all duration-300 hover:bg-crimson-neon hover:text-white rounded-sm skew-x-[-10deg] shadow-neon-purple hover:shadow-neon-red"
                 >
                   <span className="skew-x-[10deg] flex items-center gap-2">
-                    {isConnected ? "Открыть дашборд" : "Подключить кошелёк"}
+                    {isConnected ? "Открыть инфо о кошельке" : "Подключить кошелёк"}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </button>
@@ -190,7 +189,7 @@ export const HomePage = () => {
           Текущее состояние <span className="text-purple-neon">пула</span>
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex justify-center">
           <LiquidityPoolCard
             activeSymbol={activeSymbol}
             ethReserve={displayReserveETH}
@@ -207,7 +206,7 @@ export const HomePage = () => {
 
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500 font-mono">
-            * Данные обновляются в реальном времени при каждом запросе к блокчейну.
+            * Данные обновляются в реальном времени при каждом запросе к rpc.
           </p>
         </div>
       </section>
@@ -220,7 +219,7 @@ export const HomePage = () => {
           Готовы начать?
         </h2>
         <p className="text-gray-400 max-w-xl mx-auto mb-8">
-          Подключите кошелёк и начните обменивать токены или стать поставщиком ликвидности уже сейчас.
+          Подключите кошелёк и начните обменивать токены
         </p>
 
         <ConnectKitButton.Custom>
@@ -237,12 +236,6 @@ export const HomePage = () => {
           )}
         </ConnectKitButton.Custom>
       </section>
-
-      <div className="flex justify-center gap-6 text-gray-500">
-        <a href="https://github.com/senyich" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-          <Github className="w-6 h-6" />
-        </a>
-      </div>
     </div>
   );
 };

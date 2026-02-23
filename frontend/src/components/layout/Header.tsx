@@ -19,8 +19,8 @@ const Header = () => {
   }, [isMenuOpen]);
 
   const navigation = [
-    { name: 'Торговля', href: '/trade', icon: <ArrowRightLeft className="w-5 h-5" /> },
-    { name: 'Кабинет', href: '/', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { name: 'Торговля', href: '/swap', icon: <ArrowRightLeft className="w-5 h-5" /> },
+    { name: 'Кабинет', href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
   ];
 
   return (
