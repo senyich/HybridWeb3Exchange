@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Hexagon, LayoutDashboard, ArrowRightLeft, Github, ExternalLink } from 'lucide-react';
+import { Menu, X, Hexagon, LayoutDashboard, ArrowRightLeft, Droplets, Github, ExternalLink } from 'lucide-react';
 import { ConnectKitButton } from "connectkit";
 
 const Header = () => {
@@ -20,6 +20,7 @@ const Header = () => {
 
   const navigation = [
     { name: 'Торговля', href: '/swap', icon: <ArrowRightLeft className="w-5 h-5" /> },
+    { name: 'Ликвидность', href: '/liquidity', icon: <Droplets className="w-5 h-5" /> },
     { name: 'Кабинет', href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
   ];
 

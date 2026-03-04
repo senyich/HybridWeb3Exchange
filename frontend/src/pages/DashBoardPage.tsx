@@ -90,6 +90,20 @@ export const DashboardPage = () => {
     args: [selectedTokenAddr],
   });
 
+  const { data: ethPriceInTokens } = useReadContract({
+    address: EXCHANGE_CONTRACT_ADDRESS,
+    abi: EXCHANGE_BASE_ABI,
+    functionName: "getETHPriceInTokens",
+    args: [selectedTokenAddr],
+  });
+
+  const { data: tokenPriceInETH } = useReadContract({
+    address: EXCHANGE_CONTRACT_ADDRESS,
+    abi: EXCHANGE_BASE_ABI,
+    functionName: "getTokenPriceInETH",
+    args: [selectedTokenAddr],
+  });
+
   const { data: userLiquidityRaw, isLoading: isLiquidityLoading } = useReadContract({
     address: EXCHANGE_CONTRACT_ADDRESS,
     abi: EXCHANGE_BASE_ABI,
@@ -161,6 +175,8 @@ export const DashboardPage = () => {
               totalLiquidity={displayTotalLiquidity}
               isLoading={isPoolLoading}
               isSymbolLoading={isSymbolLoading}
+              ethPriceInTokens={ethPriceInTokens}
+              tokenPriceInETH={tokenPriceInETH}
             />
              <ContractAddressCard
               exchangeAddress={EXCHANGE_CONTRACT_ADDRESS}
@@ -210,6 +226,8 @@ export const DashboardPage = () => {
               totalLiquidity={displayTotalLiquidity}
               isLoading={isPoolLoading}
               isSymbolLoading={isSymbolLoading}
+              ethPriceInTokens={ethPriceInTokens}
+              tokenPriceInETH={tokenPriceInETH}
             />
             <UserInfoCard
               isConnected={isConnected}

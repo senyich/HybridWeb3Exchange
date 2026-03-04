@@ -10,26 +10,26 @@ async function main() {
   const balance = await hre.ethers.provider.getBalance(deployer.address);
   console.log("Баланс ETH:", hre.ethers.formatEther(balance));
 
-  console.log("Создаем токены...");
-  const MyToken = await hre.ethers.getContractFactory("MyToken");
+  // console.log("Создаем токены...");
+  // const MyToken = await hre.ethers.getContractFactory("MyToken");
 
-  const topCoin = await MyToken.deploy("TopCOIN", "TC", hre.ethers.parseUnits("1000000", 18));
-  await topCoin.waitForDeployment();
-  const tcAddress = await topCoin.getAddress();
-  console.log(`   -> TopCOIN (TC): ${tcAddress}`);
-  await sleep(2000); 
+  // const topCoin = await MyToken.deploy("TopCOIN", "TC", hre.ethers.parseUnits("1000000", 18));
+  // await topCoin.waitForDeployment();
+  // const tcAddress = await topCoin.getAddress();
+  // console.log(`   -> TopCOIN (TC): ${tcAddress}`);
+  // await sleep(2000); 
 
-  const topGem = await MyToken.deploy("TopGEM", "TG", hre.ethers.parseUnits("1000000", 18));
-  await topGem.waitForDeployment();
-  const tgAddress = await topGem.getAddress();
-  console.log(`   -> TopGEM (TG):  ${tgAddress}`);
-  await sleep(2000); 
+  // const topGem = await MyToken.deploy("TopGEM", "TG", hre.ethers.parseUnits("1000000", 18));
+  // await topGem.waitForDeployment();
+  // const tgAddress = await topGem.getAddress();
+  // console.log(`   -> TopGEM (TG):  ${tgAddress}`);
+  // await sleep(2000); 
 
-  const monkeyCoin = await MyToken.deploy("MonkeyCoin", "MC", hre.ethers.parseUnits("1000000", 18));
-  await monkeyCoin.waitForDeployment();
-  const mcAddress = await monkeyCoin.getAddress();
-  console.log(`   -> MonkeyCoin (MC): ${mcAddress}`);
-  await sleep(2000); 
+  // const monkeyCoin = await MyToken.deploy("MonkeyCoin", "MC", hre.ethers.parseUnits("1000000", 18));
+  // await monkeyCoin.waitForDeployment();
+  // const mcAddress = await monkeyCoin.getAddress();
+  // console.log(`   -> MonkeyCoin (MC): ${mcAddress}`);
+  // await sleep(2000); 
 
 
   console.log("\nHybridExchangeAMM...");
@@ -42,7 +42,6 @@ async function main() {
   await sleep(5000); 
 
 
-  console.log("\n3. Заливаем ликвидность с разными курсами...");
 
   console.log("\n=============================================");
   console.log("ДЕПЛОЙ И НАСТРОЙКА ЗАВЕРШЕНЫ УСПЕШНО!");

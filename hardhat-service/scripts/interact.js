@@ -5,7 +5,7 @@ async function main() {
   console.log("🛠 Настройка ликвидности для существующих контрактов");
   console.log("Аккаунт:", deployer.address);
 
-  const EXCHANGE_ADDR = "0xf9C7E28281e302912e3728241fb3eB77d8Fcb9c4";
+  const EXCHANGE_ADDR = "";
   const TC_ADDR = "0x8EdDd55579F72E99fCbe2fc9747edd46B1f032AC";
   const TG_ADDR = "0x9c5956607797FdC78216FfDc4d608953eED655ad";
   const MC_ADDR = "0x3b2a9049685AACb584789C630d8c3d1d15D77AbD";

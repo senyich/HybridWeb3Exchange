@@ -8,6 +8,7 @@ import { DashboardPage } from "./pages/DashBoardPage";
 import { Footer } from "./components/layout/Footer";
 import SwapPage from "./pages/SwapPage";
 import { HomePage } from "./pages/HomePage";
+import LiquidityPage from "./pages/LiquidityPage";
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/swap" element={<SwapPage />} />
+                  <Route path="/liquidity" element={<LiquidityPage />} />
                   <Route path="/dashboard" element={<DashboardPage />} />
                 </Routes>
               </main>

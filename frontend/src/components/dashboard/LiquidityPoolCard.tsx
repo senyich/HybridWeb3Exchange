@@ -9,6 +9,8 @@ interface LiquidityPoolCardProps {
   totalLiquidity: string | null;
   isLoading: boolean;
   isSymbolLoading?: boolean;
+  ethPriceInTokens?: bigint;
+  tokenPriceInETH?: bigint;
 }
 
 export const LiquidityPoolCard = ({
@@ -18,7 +20,16 @@ export const LiquidityPoolCard = ({
   totalLiquidity,
   isLoading,
   isSymbolLoading = false,
+  ethPriceInTokens,
+  tokenPriceInETH,
 }: LiquidityPoolCardProps) => {
+  const displayEthPrice = ethPriceInTokens
+    ? (Number(ethPriceInTokens) / 1e18).toFixed(6)
+    : "0";
+  const displayTokenPrice = tokenPriceInETH
+    ? (Number(tokenPriceInETH) / 1e18).toFixed(6)
+    : "0";
+
   return (
     <Card className="md:col-span-6">
       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
@@ -42,6 +53,20 @@ export const LiquidityPoolCard = ({
           unit={activeSymbol}
           isLoading={isLoading || isSymbolLoading}
         />
+        <div className="mt-2 pt-2 border-t border-white/5">
+          <StatRow
+            label="1 ETH Price"
+            value={displayEthPrice}
+            unit={activeSymbol}
+            isLoading={isLoading}
+          />
+          <StatRow
+            label={`1 ${activeSymbol} Price`}
+            value={displayTokenPrice}
+            unit="ETH"
+            isLoading={isLoading}
+          />
+        </div>
         <div className="mt-2">
           <StatRow
             label="Total Liquidity In Tokens"

@@ -187,25 +187,12 @@ export const EXCHANGE_BASE_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "tokenAddr",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenAmount",
-        type: "uint256",
-      },
+      { internalType: "address", name: "tokenAddr", type: "address" },
+      { internalType: "uint256", name: "tokenAmountDesired", type: "uint256" },
+      { internalType: "uint256", name: "deadline", type: "uint256" },
     ],
     name: "addLiquidity",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "liquidityMinted",
-        type: "uint256",
-      },
-    ],
+    outputs: [{ internalType: "uint256", name: "liquidityMinted", type: "uint256" }],
     stateMutability: "payable",
     type: "function",
   },
@@ -367,29 +354,14 @@ export const EXCHANGE_BASE_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "tokenAddr",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "liquidityAmount",
-        type: "uint256",
-      },
+      { internalType: "address", name: "tokenAddr", type: "address" },
+      { internalType: "uint256", name: "liquidityAmount", type: "uint256" },
+      { internalType: "uint256", name: "deadline", type: "uint256" },
     ],
     name: "removeLiquidity",
     outputs: [
-      {
-        internalType: "uint256",
-        name: "ethAmount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenAmount",
-        type: "uint256",
-      },
+      { internalType: "uint256", name: "ethAmount", type: "uint256" },
+      { internalType: "uint256", name: "tokenAmount", type: "uint256" },
     ],
     stateMutability: "nonpayable",
     type: "function",
@@ -466,7 +438,29 @@ export const EXCHANGE_BASE_ABI = [
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
-  },{
+  },
+  {
+    inputs: [{ internalType: "address", name: "tokenAddr", type: "address" }],
+    name: "getETHPriceInTokens",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "tokenAddr", type: "address" }],
+    name: "getTokenPriceInETH",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "tokenAddr", type: "address" }],
+    name: "sync",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       { internalType: "uint256", name: "inputAmount", type: "uint256" },
       { internalType: "uint256", name: "inputReserve", type: "uint256" },
